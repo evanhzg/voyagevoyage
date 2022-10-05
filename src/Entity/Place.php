@@ -131,12 +131,12 @@ class Place
         return $this;
     }
 
-    public function getCity(): ?Cities
+    public function getCity(): ?City
     {
         return $this->city;
     }
 
-    public function setCity(?Cities $city): self
+    public function setCity(?City $city): self
     {
         $this->city = $city;
 
