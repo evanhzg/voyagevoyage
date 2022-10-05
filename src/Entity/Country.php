@@ -30,12 +30,12 @@ class Country
     #[ORM\Column]
     private ?bool $status = null;
 
-    #[ORM\OneToMany(mappedBy: 'country', targetEntity: Cities::class)]
+    #[ORM\OneToMany(mappedBy: 'country', targetEntity: City::class)]
     private Collection $cities;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Cities $capital = null;
+    private ?City $capital = null;
 
     public function __construct()
     {
@@ -108,14 +108,14 @@ class Country
     }
 
     /**
-     * @return Collection<int, Cities>
+     * @return Collection<int, City>
      */
     public function getCities(): Collection
     {
         return $this->cities;
     }
 
-    public function addCity(Cities $city): self
+    public function addCity(City $city): self
     {
         if (!$this->cities->contains($city)) {
             $this->cities->add($city);
@@ -125,7 +125,7 @@ class Country
         return $this;
     }
 
-    public function removeCity(Cities $city): self
+    public function removeCity(City $city): self
     {
         if ($this->cities->removeElement($city)) {
             // set the owning side to null (unless already changed)
@@ -137,12 +137,12 @@ class Country
         return $this;
     }
 
-    public function getCapital(): ?Cities
+    public function getCapital(): ?City
     {
         return $this->capital;
     }
 
-    public function setCapital(Cities $capital): self
+    public function setCapital(City $capital): self
     {
         $this->capital = $capital;
 

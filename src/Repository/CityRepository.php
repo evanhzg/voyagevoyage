@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\Cities;
+use App\Entity\City;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Cities>
+ * @extends ServiceEntityRepository<City>
  *
- * @method Cities|null find($id, $lockMode = null, $lockVersion = null)
- * @method Cities|null findOneBy(array $criteria, array $orderBy = null)
- * @method Cities[]    findAll()
- * @method Cities[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method City|null find($id, $lockMode = null, $lockVersion = null)
+ * @method City|null findOneBy(array $criteria, array $orderBy = null)
+ * @method City[]    findAll()
+ * @method City[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class CitiesRepository extends ServiceEntityRepository
+class CityRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Cities::class);
+        parent::__construct($registry, City::class);
     }
 
-    public function save(Cities $entity, bool $flush = false): void
+    public function save(City $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class CitiesRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(Cities $entity, bool $flush = false): void
+    public function remove(City $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -40,7 +40,7 @@ class CitiesRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return Cities[] Returns an array of Cities objects
+//     * @return City[] Returns an array of City objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -54,7 +54,7 @@ class CitiesRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Cities
+//    public function findOneBySomeField($value): ?City
 //    {
 //        return $this->createQueryBuilder('c')
 //            ->andWhere('c.exampleField = :val')

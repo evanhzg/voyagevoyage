@@ -2,14 +2,14 @@
 
 namespace App\Entity;
 
-use App\Repository\CitiesRepository;
+use App\Repository\CityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: CitiesRepository::class)]
-class Cities
+#[ORM\Entity(repositoryClass: CityRepository::class)]
+class City
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -32,7 +32,7 @@ class Cities
     #[ORM\Column]
     private ?bool $status = null;
 
-    #[ORM\OneToMany(mappedBy: 'city', targetEntity: Places::class)]
+    #[ORM\OneToMany(mappedBy: 'city', targetEntity: Place::class)]
     private Collection $places;
 
     public function __construct()
@@ -106,14 +106,14 @@ class Cities
     }
 
     /**
-     * @return Collection<int, Places>
+     * @return Collection<int, Place>
      */
     public function getPlaces(): Collection
     {
         return $this->places;
     }
 
-    public function addPlace(Places $place): self
+    public function addPlace(Place $place): self
     {
         if (!$this->places->contains($place)) {
             $this->places->add($place);
@@ -123,7 +123,7 @@ class Cities
         return $this;
     }
 
-    public function removePlace(Places $place): self
+    public function removePlace(Place $place): self
     {
         if ($this->places->removeElement($place)) {
             // set the owning side to null (unless already changed)

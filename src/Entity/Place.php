@@ -2,12 +2,12 @@
 
 namespace App\Entity;
 
-use App\Repository\PlacesRepository;
+use App\Repository\PlaceRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: PlacesRepository::class)]
-class Places
+#[ORM\Entity(repositoryClass: PlaceRepository::class)]
+class Place
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -37,7 +37,7 @@ class Places
 
     #[ORM\ManyToOne(inversedBy: 'places')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Cities $city = null;
+    private ?City $city = null;
 
     #[ORM\Column]
     private ?bool $status = null;
