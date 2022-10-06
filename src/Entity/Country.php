@@ -34,7 +34,7 @@ class Country
     private Collection $cities;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?City $capital = null;
 
     public function __construct()
@@ -142,7 +142,7 @@ class Country
         return $this->capital;
     }
 
-    public function setCapital(City $capital): self
+    public function setCapital(?City $capital): self
     {
         $this->capital = $capital;
 
