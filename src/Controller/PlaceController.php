@@ -2,9 +2,19 @@
 
 namespace App\Controller;
 
+use App\Entity\Place;
+use App\Repository\PlaceRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\SerializerInterface;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Faker\Generator;
+use Faker\Factory;
 
 class PlaceController extends AbstractController
 {
@@ -16,4 +26,22 @@ class PlaceController extends AbstractController
             'path' => 'src/Controller/PlaceController.php',
         ]);
     }
+
+
+    /**
+     * Route renvoyant tous les restaurants
+     * 
+     * 
+     * @param PlaceRepository $repository
+     * @param SerializerInterface $serializer
+     * @return JsonResponse
+     */
+    #[Route("/api/places", name: "place.getAll")]
+    public function getAllPlaces(PlaceRepository $repository, SerializerInterface $serializerInterface): JsonResponse
+    {
+        $places = $repository->findAll();
+        $jsonPlaces = $serializerInterface->serialize($places, 'json', ["groups" => 'getAllPlaces']);
+        return new JsonResponse($jsonPlaces, Response::HTTP_OK,[], false);
+    }
+
 }
