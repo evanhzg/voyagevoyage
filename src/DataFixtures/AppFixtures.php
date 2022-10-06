@@ -60,6 +60,8 @@ class AppFixtures extends Fixture
             ->setType(ucfirst($this->faker->word()))
             ->setAddress($this->faker->address())
             ->setPricing(4)
+            ->setOpenHour($this->faker->dateTime())
+            ->setClosedHour($this->faker->dateTime())
             ->setStatus(1);
             $manager->persist($place);
             $manager->flush();
