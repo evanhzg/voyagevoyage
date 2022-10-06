@@ -28,10 +28,10 @@ class PlaceController extends AbstractController
     }
 
     /**
-     * Route renvoyant tous les restaurants
+     * Get a response containing each place in the database
      * 
      * 
-     * @param PlaceRepository $repository
+     * @param Country $country
      * @param SerializerInterface $serializer
      * @return JsonResponse
      */
@@ -44,7 +44,7 @@ class PlaceController extends AbstractController
     }
 
     /**
-     * Route renvoyant un restaurant selon son id
+     * Get a place based on the given id
      * 
      * 
      * @param Place $place

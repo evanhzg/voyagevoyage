@@ -26,6 +26,14 @@ class CountryController extends AbstractController
         ]);
     }
 
+    /**
+     * Get a response containing every country in the database
+     * 
+     * 
+     * @param Country $country
+     * @param SerializerInterface $serializer
+     * @return JsonResponse
+     */
     #[Route("/api/countries", name: "country.getAll")]
     public function getAllPlaces(CountryRepository $repository, SerializerInterface $serializerInterface): JsonResponse
     {
@@ -35,7 +43,7 @@ class CountryController extends AbstractController
     }
 
     /**
-     * Route renvoyant un restaurant selon son id
+     * Get a country depending of the given id
      * 
      * 
      * @param Country $country
