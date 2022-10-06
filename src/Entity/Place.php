@@ -36,7 +36,7 @@ class Place
     private ?int $pricing = null;
 
     #[ORM\ManyToOne(inversedBy: 'places')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true, onDelete: "CASCADE")]
     private ?City $city = null;
 
     #[ORM\Column]

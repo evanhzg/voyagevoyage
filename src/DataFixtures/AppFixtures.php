@@ -7,6 +7,7 @@ use Doctrine\Persistence\ObjectManager;
 use Faker\Generator;
 use Faker\Factory;
 use App\Entity\City;
+use App\Entity\Place;
 use App\Entity\Country;
 
 class AppFixtures extends Fixture
@@ -37,6 +38,7 @@ class AppFixtures extends Fixture
             ->setStatus(true);
             $countryList[] = $country;
             $manager->persist($country);
+            $manager->flush();
         }
 
         for ($i=1; $i<30; $i++)
@@ -47,21 +49,19 @@ class AppFixtures extends Fixture
             ->setDescription($this->faker->sentence(15))
             ->setCountry($countryList[array_rand($countryList)])
             ->setStatus(1);
-            $cityList[] = $city;
             $manager->persist($city);
             $manager->flush();
         }
         
         for ($i=1; $i<30; $i++)
         {
-            $city = new City();
-            $city->setName(ucfirst($this->faker->word()))
-            ->setPopulation(random_int(13000, 850000))
-            ->setDescription($this->faker->sentence(15))
-            ->setCountry($countryList[array_rand($countryList)])
+            $place = new Place();
+            $place->setName(ucfirst($this->faker->word()))
+            ->setType(ucfirst($this->faker->word()))
+            ->setAddress($this->faker->address())
+            ->setPricing(4)
             ->setStatus(1);
-            $cityList[] = $city;
-            $manager->persist($city);
+            $manager->persist($place);
             $manager->flush();
         }
     }
