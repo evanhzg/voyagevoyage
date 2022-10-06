@@ -34,7 +34,7 @@ class Country
     private Collection $cities;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: true)]
+    #[ORM\JoinColumn(nullable: true, onDelete: "CASCADE")]
     private ?City $capital = null;
 
     public function __construct()

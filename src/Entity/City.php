@@ -20,7 +20,7 @@ class City
     private ?string $name = null;
 
     #[ORM\ManyToOne(inversedBy: 'cities')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true, onDelete: "CASCADE")]
     private ?Country $country = null;
 
     #[ORM\Column]
