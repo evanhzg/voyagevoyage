@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entities\City;
+use App\Entity\City;
 use App\Repository\CityRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
@@ -33,5 +33,22 @@ class CityController extends AbstractController
         $cities = $repository->findAll();
         $jsonCities = $serializerInterface->serialize($cities, 'json', ["groups" => 'getAllCities']);
         return new JsonResponse($jsonCities, Response::HTTP_OK,[], false);
+    }
+
+    /**
+     * Route renvoyant un restaurant selon son id
+     * 
+     * 
+     * @param City $city
+     * @param SerializerInterface $serializer
+     * @return JsonResponse
+     */
+    #[Route("/api/cities/{idCity}", name: "city.get", methods: ['GET'])]
+    #[ParamConverter("city", options: ["id" =>"idCity"])]
+    public function getCity(City $city, SerializerInterface $serializer): JsonResponse
+    {
+        $jsonCity = $serializer->serialize($city, 'json', ["groups" => 'getCity']);
+        
+        return new JsonResponse($jsonCity, Response::HTTP_OK, ['accept' => 'jsons'], true);
     }
 }

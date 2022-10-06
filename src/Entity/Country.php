@@ -14,11 +14,11 @@ class Country
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['getAllCountries'])]
+    #[Groups(['getAllCountries', 'getCountry'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['getAllCountries'])]
+    #[Groups(['getAllCountries', 'getCountry'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 5, nullable: true)]
@@ -38,7 +38,7 @@ class Country
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: true, onDelete: "CASCADE")]
-    #[Groups(['getAllCountries'])]
+    #[Groups(['getAllCountries', 'getCountry'])]
     private ?City $capital = null;
 
     public function __construct()

@@ -15,20 +15,20 @@ class City
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['getAllCities'])]
+    #[Groups(['getAllCities', 'getCity'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['getAllCities'])]
+    #[Groups(['getAllCities', 'getCity'])]
     private ?string $name = null;
 
     #[ORM\ManyToOne(inversedBy: 'cities')]
     #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
-    #[Groups(['getAllCities'])]
+    #[Groups(['getAllCities', 'getCity'])]
     private ?Country $country = null;
 
     #[ORM\Column]
-    #[Groups(['getAllCities'])]
+    #[Groups(['getAllCities', 'getCity'])]
     private ?int $population = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]

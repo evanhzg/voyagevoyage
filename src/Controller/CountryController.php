@@ -33,4 +33,21 @@ class CountryController extends AbstractController
         $jsonCountries = $serializerInterface->serialize($countries, 'json', ["groups" => 'getAllCountries']);
         return new JsonResponse($jsonCountries, Response::HTTP_OK,[], false);
     }
+
+    /**
+     * Route renvoyant un restaurant selon son id
+     * 
+     * 
+     * @param Country $country
+     * @param SerializerInterface $serializer
+     * @return JsonResponse
+     */
+    #[Route("/api/countries/{idCountry}", name: "country.get", methods: ['GET'])]
+    #[ParamConverter("country", options: ["id" =>"idCountry"])]
+    public function getCountry(Country $country, SerializerInterface $serializer): JsonResponse
+    {
+        $jsonCountry = $serializer->serialize($country, 'json', ["groups" => 'getCountry']);
+        
+        return new JsonResponse($jsonCountry, Response::HTTP_OK, ['accept' => 'jsons'], true);
+    }
 }

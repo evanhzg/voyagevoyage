@@ -14,14 +14,14 @@ class Place
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['getAllPlaces'])]
+    #[Groups(['getAllPlaces', 'getPlace'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['getAllPlaces'])]
+    #[Groups(['getAllPlaces', 'getPlace'])]
     private ?string $name = null;
 
-    #[Groups(['getAllPlaces'])]
+    #[Groups(['getAllPlaces', 'getPlace'])]
     #[ORM\Column(length: 255)]
     private ?string $type = null;
 
@@ -42,7 +42,7 @@ class Place
 
     #[ORM\ManyToOne(inversedBy: 'places')]
     #[ORM\JoinColumn(nullable: true, onDelete: "CASCADE")]
-    #[Groups(['getAllPlaces'])]
+    #[Groups(['getAllPlaces', 'getPlace'])]
     private ?City $city = null;
 
     #[ORM\Column]

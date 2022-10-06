@@ -27,7 +27,6 @@ class PlaceController extends AbstractController
         ]);
     }
 
-
     /**
      * Route renvoyant tous les restaurants
      * 
@@ -44,4 +43,20 @@ class PlaceController extends AbstractController
         return new JsonResponse($jsonPlaces, Response::HTTP_OK,[], false);
     }
 
+    /**
+     * Route renvoyant un restaurant selon son id
+     * 
+     * 
+     * @param Place $place
+     * @param SerializerInterface $serializer
+     * @return JsonResponse
+     */
+    #[Route("/api/places/{idPlace}", name: "place.get", methods: ['GET'])]
+    #[ParamConverter("place", options: ["id" =>"idPlace"])]
+    public function getPlace(Place $place, SerializerInterface $serializer): JsonResponse
+    {
+        $jsonPlace = $serializer->serialize($place, 'json', ["groups" => 'getPlace']);
+        
+        return new JsonResponse($jsonPlace, Response::HTTP_OK, ['accept' => 'jsons'], true);
+    }
 }
