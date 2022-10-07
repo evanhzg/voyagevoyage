@@ -2,12 +2,6 @@
 
 namespace App\Controller;
 
-<<<<<<< HEAD
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Annotation\Route;
-
-=======
 use App\Entity\Country;
 use App\Repository\CountryRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,7 +15,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Faker\Generator;
 use Faker\Factory;
->>>>>>> 35c6d3c510f015e26f7af159de4861ebbf9a107c
 class CountryController extends AbstractController
 {
     #[Route('/country', name: 'app_country')]
@@ -32,8 +25,6 @@ class CountryController extends AbstractController
             'path' => 'src/Controller/CountryController.php',
         ]);
     }
-<<<<<<< HEAD
-=======
 
     /**
      * Get a response containing every country in the database
@@ -115,5 +106,4 @@ class CountryController extends AbstractController
 
         return new JsonResponse($jsonCountry, Response::HTTP_CREATED, [], true);
     }
->>>>>>> 35c6d3c510f015e26f7af159de4861ebbf9a107c
 }

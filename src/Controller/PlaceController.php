@@ -2,11 +2,6 @@
 
 namespace App\Controller;
 
-<<<<<<< HEAD
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Annotation\Route;
-=======
 use App\Entity\Place;
 use App\Repository\PlaceRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -20,7 +15,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Faker\Generator;
 use Faker\Factory;
->>>>>>> 35c6d3c510f015e26f7af159de4861ebbf9a107c
 
 class PlaceController extends AbstractController
 {
@@ -32,8 +26,6 @@ class PlaceController extends AbstractController
             'path' => 'src/Controller/PlaceController.php',
         ]);
     }
-<<<<<<< HEAD
-=======
 
     /**
      * Get a response containing each place in the database
@@ -67,5 +59,4 @@ class PlaceController extends AbstractController
         
         return new JsonResponse($jsonPlace, Response::HTTP_OK, ['accept' => 'jsons'], true);
     }
->>>>>>> 35c6d3c510f015e26f7af159de4861ebbf9a107c
 }
