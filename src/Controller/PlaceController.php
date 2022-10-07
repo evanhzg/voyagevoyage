@@ -59,4 +59,15 @@ class PlaceController extends AbstractController
         
         return new JsonResponse($jsonPlace, Response::HTTP_OK, ['accept' => 'jsons'], true);
     }
+
+    #[Route('/api/place/{idPlace}', name: 'place.delete', methods: ['DELETE'])]
+    #[ParamConverter("place", options : ["id"=>"idPlace"])]
+    public function deleteCity(Place $place, EntityManagerInterface $entityManager) :JsonResponse
+    {
+         $place->setStatus(false);
+         $entityManager->flush();
+
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+
+    }
 }
