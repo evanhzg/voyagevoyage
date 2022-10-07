@@ -3,8 +3,10 @@
 namespace App\Entity;
 
 use App\Repository\PlaceRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Doctrine\DBAL\Types\Types;
+# use Symfony\Component\Validator\Constraints as Asserts;
 
 #[ORM\Entity(repositoryClass: PlaceRepository::class)]
 class Place
@@ -12,11 +14,14 @@ class Place
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['getAllPlaces', 'getPlace'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['getAllPlaces', 'getPlace'])]
     private ?string $name = null;
 
+    #[Groups(['getAllPlaces', 'getPlace'])]
     #[ORM\Column(length: 255)]
     private ?string $type = null;
 
@@ -37,6 +42,7 @@ class Place
 
     #[ORM\ManyToOne(inversedBy: 'places')]
     #[ORM\JoinColumn(nullable: true, onDelete: "CASCADE")]
+    #[Groups(['getAllPlaces', 'getPlace'])]
     private ?City $city = null;
 
     #[ORM\Column]

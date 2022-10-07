@@ -67,6 +67,14 @@ class AppFixtures extends Fixture
                     $manager->persist($place);
                     $manager->flush();
                 }
+<<<<<<< HEAD
+=======
+
+
+                $country->getCapital() ?? $country->setCapital($city);
+                $manager->persist($country);
+                $manager->flush();
+>>>>>>> 35c6d3c510f015e26f7af159de4861ebbf9a107c
             }
         }
     }
