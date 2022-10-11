@@ -2,19 +2,22 @@
 
 namespace App\Controller;
 
+use Faker\Factory;
+use Faker\Generator;
 use App\Entity\Place;
+use Doctrine\ORM\EntityManager;
 use App\Repository\PlaceRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Faker\Generator;
-use Faker\Factory;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
 class PlaceController extends AbstractController
 {
@@ -60,6 +63,14 @@ class PlaceController extends AbstractController
         return new JsonResponse($jsonPlace, Response::HTTP_OK, ['accept' => 'jsons'], true);
     }
 
+    /**
+     * Deleting a place name
+     * 
+     * 
+     * @param Place $place
+     * @param SerializerInterface $serializer
+     * @return JsonResponse
+     */    
     #[Route('/api/place/{idPlace}', name: 'place.delete', methods: ['DELETE'])]
     #[ParamConverter("place", options : ["id"=>"idPlace"])]
     public function deleteCity(Place $place, EntityManagerInterface $entityManager) :JsonResponse
@@ -69,5 +80,46 @@ class PlaceController extends AbstractController
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
 
+    }
+
+    /**
+     * Adding a place name
+     * 
+     * 
+     * @param Place $place
+     * @param SerializerInterface $serializer
+     * @return JsonResponse
+     */
+    #[Route('/api/place/', name: 'place.turnOff', methods: ['POST'])]
+    public function addplace(Request $request, EntityManager $entityManager, SerializerInterface $serializer):JsonResponse
+    {
+        $place = $serializer->deserialize($request->getContent(), Place::class, 'json');
+        $place->setStatus(true);
+        $entityManager->persist($place);
+        $entityManager->flush();
+        $jsonPlace = $serializer->serialize($place, 'json');
+        return new JsonResponse($jsonPlace, Response::HTTP_CREATED, [], true);
+    }
+
+    /**
+     * updating a place (changing adress, etc...)
+     * 
+     * 
+     * @param Place $place
+     * @param SerializerInterface $serializer
+     * @return JsonResponse
+     */
+    #[Route('/api/place/', name: 'place.update', methods: ['PUT'])]
+    #[ParamConverter("placeName", options : ["id"=>"idPlace"])]
+    public function updatePlace(Place $place, Request $request, EntityManager $entityManager, SerializerInterface $serializer):JsonResponse
+    {
+        $placeUpdate = $serializer->deserialize($request->getContent(), Place::class, 'json',
+        [AbstractNormalizer::OBJECT_TO_POPULATE=> $place]);
+        $request->toArray();   //i don't know if it's correct :)
+        $placeUpdate->setStatus(true);
+        $entityManager->persist($place);
+        $entityManager->flush();
+        $jsonPlace = $serializer->serialize($placeUpdate, 'json');
+        return new JsonResponse($jsonPlace, Response::HTTP_RESET_CONTENT, [], true);
     }
 }
