@@ -27,9 +27,6 @@ class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        $countryList = [];
-        $cityList = [];
-
         for ($i=0; $i<8; $i++)
         {
             $country = new Country();
@@ -38,23 +35,18 @@ class AppFixtures extends Fixture
             ->setEuropean(random_int(0,1))
             ->setTimeZone('UTC+' . random_int(0, 14))
             ->setStatus(true);
-            $countryList[] = $country;
-            $manager->persist($country);
-            $manager->flush();
 
-            for ($i=1; $i<30; $i++)
+            for ($j=0; $j<10; $j++)
             {
                 $city = new City();
                 $city->setName(ucfirst($this->faker->word()))
                 ->setPopulation(random_int(13000, 850000))
                 ->setDescription($this->faker->sentence(15))
-                ->setCountry($countryList[array_rand($countryList)])
+                ->setCountry($country)
                 ->setStatus(1);
                 $manager->persist($city);
-                $manager->flush();
             
-            
-                for ($i=1; $i<30; $i++)
+                for ($k=0; $k<10; $k++)
                 {
                     $place = new Place();
                     $place->setName(ucfirst($this->faker->word()))
@@ -63,20 +55,14 @@ class AppFixtures extends Fixture
                     ->setPricing(4)
                     ->setOpenHour($this->faker->dateTime())
                     ->setClosedHour($this->faker->dateTime())
+                    ->setCity($city)
                     ->setStatus(1);
                     $manager->persist($place);
-                    $manager->flush();
                 }
-<<<<<<< HEAD
-=======
-
-
-                $country->getCapital() ?? $country->setCapital($city);
-                $manager->persist($country);
-                $manager->flush();
->>>>>>> 35c6d3c510f015e26f7af159de4861ebbf9a107c
             }
+            $country->setCapital($city);
+            $manager->persist($country);
+            $manager->flush();
         }
     }
 }
-//toto

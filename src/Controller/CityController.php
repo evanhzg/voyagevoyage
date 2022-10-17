@@ -30,9 +30,9 @@ class CityController extends AbstractController
     }
 
 
-    #[Route('/city', name: 'city.get', methode: ['POST'])]
-    public function createCity(Request $request, EntityManager $entityManager) : JsonResponse
-    {
+    // #[Route('/city', name: 'city.get', methode: ['POST'])]
+    // public function createCity(Request $request, EntityManager $entityManager) : JsonResponse
+    // {
 
-    }
+    // }
 }
