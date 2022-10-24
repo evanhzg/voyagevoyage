@@ -21,89 +21,121 @@ class CountryController extends AbstractController
     public function index(): JsonResponse
     {
         return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/CountryController.php',
+            'message' => 'Wrong route, try "api/country"',
         ]);
     }
 
     /**
-     * Get a response containing every country in the database
+     * Path that returns all coutries
      * 
+     * @param CountryRepository $countryRepository
+     * @param SerializerInterface $serializer
+     * @return JsonResponse
+     */
+    #[Route('/api/country', name: 'countries.getAll', methods: ['GET'])]
+    public function getAllCountries(CountryRepository $countryRepository, SerializerInterface $serializer): JsonResponse
+    {
+        $countries = $countryRepository->findAll();
+        $jsonCountries = $serializer->serialize($countries, 'json', ["groups" => "getAllCountries"]);
+        return new JsonResponse($jsonCountries, Response::HTTP_OK, [], true);
+    }
+
+    /**
+     * Path that returns one country by its id
      * 
      * @param Country $country
      * @param SerializerInterface $serializer
      * @return JsonResponse
      */
-    #[Route("/api/countries", name: "country.getAll")]
-    public function getAllPlaces(CountryRepository $repository, SerializerInterface $serializerInterface): JsonResponse
+    #[Route('/api/country/{idCountry}', name: 'country.get', methods:['GET'])]
+    #[ParamConverter('country', options: ['id' => 'idCountry'])]
+    public function getCountry(Country $country, SerializerInterface $serializer): JsonResponse
     {
-        $countries = $repository->findBy(['status' => 'true']);
-        $jsonCountries = $serializerInterface->serialize($countries, 'json', ["groups" => 'getAllCountries']);
-        return new JsonResponse($jsonCountries, Response::HTTP_OK,[], false);
+        $country->getCapital();
+        $jsonCountry = $serializer->serialize($country, 'json', ["groups" => "getCountry"]);
+        return new JsonResponse($jsonCountry, Response::HTTP_OK, ['accept' => 'jsons'], true);
     }
 
     /**
-     * Get a country depending of the given id
+     * Path that returns all coutries
      * 
-     * 
-     * @param Country $country
+     * @param CountryRepository $countryRepository
      * @param SerializerInterface $serializer
      * @return JsonResponse
      */
-    #[Route("/api/countries/{idCountry}", name: "country.get", methods: ['GET'])]
-    #[ParamConverter("country", options: ["id" =>"idCountry"])]
-    public function getCountry(CountryRepository $repository, Country $country, SerializerInterface $serializer): JsonResponse
-    {
-        $jsonCountry = $serializer->serialize($country, 'json', ["groups" => 'getCountry']);
-        
-        return $country->isStatus() ? 
-        new JsonResponse($jsonCountry, Response::HTTP_OK, ['accept' => 'jsons'], true) : 
-        new JsonResponse(null, Response::HTTP_NO_CONTENT, [], false);
-    }
-
-    /**
-     * Deletes a given country
-     * 
-     * @param Country $country
-     * @param EntityManagerInterface $entityManager
-     * @return JsonResponse
-     */
-    #[Route("/api/countries/{idCountry}", name: "country.delete", methods: ['DELETE'])]
-    #[ParamConverter("country", options: ["id" =>"idCountry"])]
+    #[ParamConverter('country', options: ['id' => 'idCountry'])]
     public function deleteCountry(Country $country, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $entityManager->remove($country);
+        $entityManager->flush();
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT, []);
+    }
+
+    /**
+     * Path that returns all coutries
+     * 
+     * @param CountryRepository $countryRepository
+     * @param SerializerInterface $serializer
+     * @return JsonResponse
+     */
+    #[Route('/api/country/{idCountry}', name: 'countries.delete', methods:['DELETE'])]
+    #[ParamConverter('country', options: ['id' => 'idCountry'])]
+    public function desactivateCountry(Country $country, EntityManagerInterface $entityManager): JsonResponse
     {
         $country->setStatus(false);
         $entityManager->flush();
-
-        return new JsonResponse();
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT, []);
     }
 
     /**
-     * Add a new Country
+     * Path that returns all coutries
      * 
-     * @param int $id
-     * @param CountryRepository $repository
+     * @param CountryRepository $countryRepository
+     * @param SerializerInterface $serializer
      * @return JsonResponse
      */
-    #[Route("/api/country", name: "country.create", methods: ['POST'])]
-    public function createCountry(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer, UrlGeneratorInterface $urlGenerator): JsonResponse
+    #[Route('/api/country', name: 'countries.create', methods:['POST'])]
+    public function createCountry(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer, UrlGeneratorInterface $urlGeneratorInterface, ValidatorInterface $validator): JsonResponse
     {
         $country = $serializer->deserialize(
             $request->getContent(),
             Country::class,
             'json'
         );
-
         $country->setStatus(true);
-
-        $content = $request->toArray();
+        $errors = $validator->validate($country);
+        if($errors->count() > 0){
+            return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);    
+        }
         $entityManager->persist($country);
         $entityManager->flush();
+        $jsonCountry = $serializer->serialize($country, 'json', ['groups' => "getCountry"]);
+        $location = $urlGeneratorInterface->generate('country.get', ['idCountry' => $country->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+        return new JsonResponse($jsonCountry, Response::HTTP_CREATED, ["Location" => $location], true);
+    }
 
-        $jsonCountry = $serializer->serialize($country, 'json', ['groups' => 'getCountry']);
-
-        $location = $urlGenerator->generate('country.get', ['idCountry' =>$country->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
-
-        return new JsonResponse($jsonCountry, Response::HTTP_CREATED, [], true);
+    /**
+     * Path that returns all coutries
+     * 
+     * @param CountryRepository $countryRepository
+     * @param SerializerInterface $serializer
+     * @return JsonResponse
+     */
+    #[Route('/api/country/{idCountry}', name: 'country.update', methods:['PATCH'])]
+    #[ParamConverter('country', options: ['id' => 'idCountry'])]
+    public function updateCountry(Request $request, Country $country, EntityManagerInterface $entityManager, SerializerInterface $serializerInterface, UrlGeneratorInterface $urlGeneratorInterface): JsonResponse
+    {
+        $updateCountry = $serializerInterface->deserialize(
+            $request->getContent(),
+            Country::class,
+            'json',
+            [AbstractNormalizer::OBJECT_TO_POPULATE => $country] 
+        );
+        $updateCountry->setStatus(true);
+        $entityManager->persist($country);
+        $entityManager->flush();
+        $jsonCountry = $serializerInterface->serialize($updateCountry, 'json', ['groups' => "getCountry"]);
+        $location = $urlGeneratorInterface->generate('country.get', ['idCountry' => $updateCountry->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+        return new JsonResponse($jsonCountry, Response::HTTP_CREATED, ["Location" => $location], true);
     }
 }

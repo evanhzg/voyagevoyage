@@ -22,12 +22,15 @@ class Country
     private ?string $name = null;
 
     #[ORM\Column(length: 5, nullable: true)]
+    #[Groups(['getAllCountries', 'getCountry'])]
     private ?string $language = null;
 
     #[ORM\Column]
+    #[Groups(['getAllCountries', 'getCountry'])]
     private ?bool $european = null;
 
     #[ORM\Column(length: 6)]
+    #[Groups(['getAllCountries', 'getCountry'])]
     private ?string $time_zone = null;
 
     #[ORM\Column]
