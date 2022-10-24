@@ -5,8 +5,9 @@ namespace App\Entity;
 use App\Repository\CityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Doctrine\DBAL\Types\Types;
 
 #[ORM\Entity(repositoryClass: CityRepository::class)]
 class City
@@ -14,16 +15,20 @@ class City
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['getAllCities', 'getCity'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['getAllCities', 'getCity'])]
     private ?string $name = null;
 
     #[ORM\ManyToOne(inversedBy: 'cities')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
+    #[Groups(['getAllCities', 'getCity'])]
     private ?Country $country = null;
 
     #[ORM\Column]
+    #[Groups(['getAllCities', 'getCity'])]
     private ?int $population = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]

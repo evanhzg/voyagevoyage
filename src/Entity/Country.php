@@ -6,6 +6,7 @@ use App\Repository\CountryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: CountryRepository::class)]
 class Country
@@ -13,9 +14,11 @@ class Country
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['getAllCountries', 'getCountry'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['getAllCountries', 'getCountry'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 5, nullable: true)]
@@ -34,7 +37,8 @@ class Country
     private Collection $cities;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true, onDelete: "CASCADE")]
+    #[Groups(['getAllCountries', 'getCountry'])]
     private ?City $capital = null;
 
     public function __construct()
@@ -142,7 +146,7 @@ class Country
         return $this->capital;
     }
 
-    public function setCapital(City $capital): self
+    public function setCapital(?City $capital): self
     {
         $this->capital = $capital;
 
