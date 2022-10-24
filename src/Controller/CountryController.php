@@ -96,13 +96,10 @@ class CountryController extends AbstractController
 
         $country->setStatus(true);
 
-        $content = $request->toArray();
         $entityManager->persist($country);
         $entityManager->flush();
 
         $jsonCountry = $serializer->serialize($country, 'json', ['groups' => 'getCountry']);
-
-        $location = $urlGenerator->generate('country.get', ['idCountry' =>$country->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
 
         return new JsonResponse($jsonCountry, Response::HTTP_CREATED, [], true);
     }
