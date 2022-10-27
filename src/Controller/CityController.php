@@ -29,10 +29,10 @@ class CityController extends AbstractController
 
     /**
      * Get a response containing every city in the database
-     * 
-     * 
-     * @param Country $country
-     * @param SerializerInterface $serializer
+     *
+     *
+     * @param CityRepository $repository
+     * @param SerializerInterface $serializerInterface
      * @return JsonResponse
      */
     #[Route("/api/cities", name: "city.getAll")]

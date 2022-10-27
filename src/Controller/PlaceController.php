@@ -29,16 +29,16 @@ class PlaceController extends AbstractController
 
     /**
      * Get a response containing each place in the database
-     * 
-     * 
-     * @param Country $country
-     * @param SerializerInterface $serializer
+     *
+     *
+     * @param PlaceRepository $repository
+     * @param SerializerInterface $serializerInterface
      * @return JsonResponse
      */
     #[Route("/api/places", name: "place.getAll")]
     public function getAllPlaces(PlaceRepository $repository, SerializerInterface $serializerInterface): JsonResponse
     {
-        $places = $repository->findAll();
+        $places = $repository->findBy(array('status' => true));
         $jsonPlaces = $serializerInterface->serialize($places, 'json', ["groups" => 'getAllPlaces']);
         return new JsonResponse($jsonPlaces, Response::HTTP_OK,[], false);
     }
@@ -55,9 +55,14 @@ class PlaceController extends AbstractController
     #[ParamConverter("place", options: ["id" =>"idPlace"])]
     public function getPlace(Place $place, SerializerInterface $serializer): JsonResponse
     {
-        $jsonPlace = $serializer->serialize($place, 'json', ["groups" => 'getPlace']);
-        
-        return new JsonResponse($jsonPlace, Response::HTTP_OK, ['accept' => 'jsons'], true);
+//        $jsonPlace = $serializer->serialize($place, 'json', ["groups" => 'getPlace']);
+//
+//        return new JsonResponse($jsonPlace, Response::HTTP_OK, ['accept' => 'jsons'], true);
+            $jsonPlace = $serializer->serialize($place, 'json', ["groups" => 'getPlace']);
+
+            return $place?->isStatus() ? new JsonResponse($jsonPlace, Response::HTTP_OK, ['accept' => 'jsons'], true)
+                :
+                new JsonResponse('Unknown place.', Response::HTTP_OK);
     }
 
     #[Route('/api/place/{idPlace}', name: 'place.delete', methods: ['DELETE'])]
