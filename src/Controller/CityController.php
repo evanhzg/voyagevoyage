@@ -31,7 +31,7 @@ class CityController extends AbstractController
      * Get a response containing every city in the database
      * 
      * 
-     * @param Country $country
+     * @param City $city
      * @param SerializerInterface $serializer
      * @return JsonResponse
      */
@@ -60,6 +60,14 @@ class CityController extends AbstractController
         return new JsonResponse($jsonCity, Response::HTTP_OK, ['accept' => 'jsons'], true);
     }
 
+    /**
+     * Deleting a city name
+     * 
+     * 
+     * @param City $city
+     * @param SerializerInterface $serializer
+     * @return JsonResponse
+     */    
     #[Route('/api/city/{idCity}', name: 'city.delete', methods: ['DELETE'])]
     #[ParamConverter("city", options : ["id"=>"idCity"])]
     public function deleteCity(City $city, EntityManagerInterface $entityManager) :JsonResponse
@@ -70,4 +78,6 @@ class CityController extends AbstractController
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
 
     }
+
+    
 }
