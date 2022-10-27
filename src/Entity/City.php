@@ -41,6 +41,9 @@ class City
     #[ORM\OneToMany(mappedBy: 'city', targetEntity: Place::class)]
     private Collection $places;
 
+    #[ORM\Column(length: 6, nullable: true)]
+    private ?string $time_zone = null;
+
     public function __construct()
     {
         $this->places = new ArrayCollection();
@@ -137,6 +140,18 @@ class City
                 $place->setCity(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getTimeZone(): ?string
+    {
+        return $this->time_zone;
+    }
+
+    public function setTimeZone(?string $time_zone): self
+    {
+        $this->time_zone = $time_zone;
 
         return $this;
     }
