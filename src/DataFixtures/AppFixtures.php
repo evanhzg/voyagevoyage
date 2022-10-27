@@ -31,11 +31,10 @@ class AppFixtures extends Fixture
         {
             $country = new Country();
             $country->setName(ucfirst($this->faker->word()))
-            ->setLanguage('fr_FR')
+            ->setLanguages('fr_FR')
             ->setEuropean(random_int(0,1))
-            ->setTimeZone('UTC+' . random_int(0, 14))
             ->setStatus(true);
-
+            $countryTimeZone = random_int(0, 14);
             for ($j=0; $j<10; $j++)
             {
                 $city = new City();
@@ -43,6 +42,7 @@ class AppFixtures extends Fixture
                 ->setPopulation(random_int(13000, 850000))
                 ->setDescription($this->faker->sentence(15))
                 ->setCountry($country)
+                ->setTimeZone('UTC+' . $countryTimeZone)
                 ->setStatus(1);
                 $manager->persist($city);
             

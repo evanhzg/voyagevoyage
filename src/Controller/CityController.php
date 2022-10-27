@@ -29,7 +29,6 @@ class CityController extends AbstractController
         ]);
     }
 
-
     /**
      * Get a city depending of the given id
      * 

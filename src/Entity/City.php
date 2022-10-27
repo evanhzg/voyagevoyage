@@ -15,11 +15,11 @@ class City
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['getAllCities', 'getCity'])]
+    #[Groups(['getAllCities', 'getCity', 'getCountry', 'getAllCountries'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['getAllCities', 'getCity'])]
+    #[Groups(['getAllCities', 'getCity', 'getCountry', 'getAllCountries'])]
     private ?string $name = null;
 
     #[ORM\ManyToOne(inversedBy: 'cities')]
@@ -28,10 +28,11 @@ class City
     private ?Country $country = null;
 
     #[ORM\Column]
-    #[Groups(['getAllCities', 'getCity'])]
+    #[Groups(['getAllCities', 'getCity', 'getCountry'])]
     private ?int $population = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['getAllCities', 'getCity', 'getCountry'])]
     private ?string $description = null;
 
     #[ORM\Column]
@@ -39,6 +40,9 @@ class City
 
     #[ORM\OneToMany(mappedBy: 'city', targetEntity: Place::class)]
     private Collection $places;
+
+    #[ORM\Column(length: 6, nullable: true)]
+    private ?string $time_zone = null;
 
     public function __construct()
     {
@@ -136,6 +140,18 @@ class City
                 $place->setCity(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getTimeZone(): ?string
+    {
+        return $this->time_zone;
+    }
+
+    public function setTimeZone(?string $time_zone): self
+    {
+        $this->time_zone = $time_zone;
 
         return $this;
     }
