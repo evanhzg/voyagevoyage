@@ -37,6 +37,7 @@ class Country
 
     #[ORM\Column]
     #[Groups(['getAllCountries', 'getCountry'])]
+    #[Assert\NotNull(message: 'You must say if the country is part of EU.')]
     #[Assert\Type('boolean')]
     private ?bool $european = null;
 
@@ -49,7 +50,6 @@ class Country
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: true, onDelete: "CASCADE")]
     #[Groups(['getAllCountries', 'getCountry'])]
-    #[Assert\NotBlank(message: 'A country must have Capital. If the Capital doesn\'t exist yet, please create the city first.')]
     private ?City $capital = null;
 
     public function __construct()

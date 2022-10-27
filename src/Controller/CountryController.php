@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
@@ -29,14 +30,17 @@ class CountryController extends AbstractController
     /**
      * Path that returns all coutries
      * 
+     * @param Request $request
      * @param CountryRepository $countryRepository
      * @param SerializerInterface $serializer
      * @return JsonResponse
      */
     #[Route('/api/countries', name: 'countries.getAll', methods: ['GET'])]
-    public function getAllCountries(CountryRepository $countryRepository, SerializerInterface $serializer): JsonResponse
+    public function getAllCountries(Request $request, CountryRepository $countryRepository, SerializerInterface $serializer): JsonResponse
     {
-        $countries = $countryRepository->findAll();
+        $page = $request->get('page', 1);
+        $limit = $request->get('limit', 10);
+        $countries = $countryRepository->findWithPagination($page, $limit);
         $jsonCountries = $serializer->serialize($countries, 'json', ["groups" => "getAllCountries"]);
         return new JsonResponse($jsonCountries, Response::HTTP_OK, [], true);
     }
@@ -52,6 +56,9 @@ class CountryController extends AbstractController
     #[ParamConverter('country', options: ['id' => 'idCountry'])]
     public function getCountry(Country $country, SerializerInterface $serializer): JsonResponse
     {
+        if(!$country->isStatus()){
+            return new JsonResponse(null, Response::HTTP_NOT_FOUND, []);
+        }
         $jsonCountry = $serializer->serialize($country, 'json', ["groups" => "getCountry"]);
         return new JsonResponse($jsonCountry, Response::HTTP_OK, ['accept' => 'jsons'], true);
     }
@@ -60,7 +67,6 @@ class CountryController extends AbstractController
      * Path that creates a country then returns it
      * 
      * @param Request $request
-     * @param CityRepository $cityRepository
      * @param EntityManagerInterface $entityManager
      * @param SerializerInterface $serializer
      * @param SerializerInterface $serializer
@@ -69,7 +75,7 @@ class CountryController extends AbstractController
      * @return JsonResponse
      */
     #[Route('/api/countries', name: 'countries.create', methods:['POST'])]
-    public function createCountry(Request $request, CityRepository $cityRepository, EntityManagerInterface $entityManager, SerializerInterface $serializer, UrlGeneratorInterface $urlGeneratorInterface, ValidatorInterface $validator): JsonResponse
+    public function createCountry(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer, UrlGeneratorInterface $urlGeneratorInterface, ValidatorInterface $validator): JsonResponse
     {
         $country = $serializer->deserialize(
             $request->getContent(),
@@ -77,9 +83,6 @@ class CountryController extends AbstractController
             'json'
         );
         $country->setStatus(true);
-        $content = $request->toArray();
-        $capitalId = $content['capitalId'] ?? -1;
-        $country->setCapital($cityRepository->find($capitalId));
         $errors = $validator->validate($country);
         if($errors->count() > 0){
             return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);    
@@ -87,8 +90,8 @@ class CountryController extends AbstractController
         $entityManager->persist($country);
         $entityManager->flush();
         $jsonCountry = $serializer->serialize($country, 'json', ['groups' => "getCountry"]);
-        $location = $urlGeneratorInterface->generate('country.get', ['idCountry' => $country->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
-        return new JsonResponse($jsonCountry, Response::HTTP_CREATED, ["Location" => $location], true);
+        $location = $urlGeneratorInterface->generate('countries.get', ['idCountry' => $country->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+        return new JsonResponse($jsonCountry . ', {"message":"For the creation to be complete please create a city and inform it is the capital of its country."}', Response::HTTP_CREATED, ["Location" => $location], true);
     }
 
     /**
@@ -108,6 +111,10 @@ class CountryController extends AbstractController
     #[ParamConverter('country', options: ['id' => 'idCountry'])]
     public function updateCountry(Request $request, Country $country, CityRepository $cityRepository, EntityManagerInterface $entityManager, SerializerInterface $serializer, UrlGeneratorInterface $urlGeneratorInterface, ValidatorInterface $validator): JsonResponse
     {
+        if(!$country->isStatus()){
+            return new JsonResponse(null, Response::HTTP_NOT_FOUND, []);
+        }
+
         $updateCountry = $serializer->deserialize(
             $request->getContent(),
             Country::class,
@@ -116,7 +123,7 @@ class CountryController extends AbstractController
         );
         $updateCountry->setStatus(true);
         $content = $request->toArray();
-        $capitalId = $content['capitalId'] ?? -1;
+        $capitalId = $content['capitalId'] ?? $country->getCapital()->getId();
         $country->setCapital($cityRepository->find($capitalId));
         $errors = $validator->validate($country);
         if($errors->count() > 0){
@@ -125,7 +132,7 @@ class CountryController extends AbstractController
         $entityManager->persist($country);
         $entityManager->flush();
         $jsonCountry = $serializer->serialize($updateCountry, 'json', ['groups' => "getCountry"]);
-        $location = $urlGeneratorInterface->generate('country.get', ['idCountry' => $updateCountry->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+        $location = $urlGeneratorInterface->generate('countries.get', ['idCountry' => $updateCountry->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
         return new JsonResponse($jsonCountry, Response::HTTP_CREATED, ["Location" => $location], true);
     }
 
