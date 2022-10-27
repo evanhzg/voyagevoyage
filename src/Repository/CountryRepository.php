@@ -2,9 +2,13 @@
 
 namespace App\Repository;
 
+use DateTime;
+use DateTimeImmutable;
 use App\Entity\Country;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @extends ServiceEntityRepository<Country>
@@ -46,6 +50,33 @@ class CountryRepository extends ServiceEntityRepository
             ->where('c.status = true')
             ->getQuery()
             ->getResult();
+    }
+
+    public function findBetweenDates(
+        DateTimeImmutable $startDate,
+        DateTimeImmutable $endDate,
+        int $page,
+        int $limit
+    ){
+        $startDate = $startDate ? $startDate : new DateTimeImmutable();
+        $qb = $this->createQueryBuilder('c');
+        $qb->add(
+            'where',
+            $qb->expr()->orX(
+                $qb->expr()->andX(
+                    $qb->expr()->gte('c.dateStart', 'startDate'),
+                    $qb->expr()->lte('c.dateStart', 'endDate')
+                ),
+                $qb->expr()->andX(
+                    $qb->expr()->gte('c.dateEnd', 'startDate'),
+                    $qb->expr()->lte('c.dateEnd', 'endDate')
+                )
+            )
+        )
+        ->setParameters(new ArrayCollection([
+            new Parameter('startDate', $startDate, Types::DATETIME_IMMUTABLE),
+            new Parameter('endDate', $endDate, Types::DATETIME_IMMUTABLE)
+        ]));
     }
 
 //    /**

@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Country;
 use App\Repository\CityRepository;
 use App\Repository\CountryRepository;
+use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,6 +17,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Symfony\Component\Cache\Adapter\TagAwareAdapter;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 class CountryController extends AbstractController
 {
@@ -36,12 +40,15 @@ class CountryController extends AbstractController
      * @return JsonResponse
      */
     #[Route('/api/countries', name: 'countries.getAll', methods: ['GET'])]
-    public function getAllCountries(Request $request, CountryRepository $countryRepository, SerializerInterface $serializer): JsonResponse
+    public function getAllCountries(Request $request, CountryRepository $countryRepository, SerializerInterface $serializer, TagAwareCacheInterface $cache): JsonResponse
     {
         $page = $request->get('page', 1);
         $limit = $request->get('limit', 10);
         $countries = $countryRepository->findWithPagination($page, $limit);
-        $jsonCountries = $serializer->serialize($countries, 'json', ["groups" => "getAllCountries"]);
+        $jsonCountries = $cache->get("getAllCountries", function (ItemInterface $item) use ($countries, $serializer) {
+            $item->tag("countriesCache");
+            return $serializer->serialize($countries, 'json', ["groups" => "getAllCountries"]);
+        });
         return new JsonResponse($jsonCountries, Response::HTTP_OK, [], true);
     }
 
@@ -144,8 +151,9 @@ class CountryController extends AbstractController
      * @return JsonResponse
      */
     #[ParamConverter('country', options: ['id' => 'idCountry'])]
-    public function deleteCountry(Country $country, EntityManagerInterface $entityManager): JsonResponse
+    public function deleteCountry(Country $country, EntityManagerInterface $entityManager, TagAwareCacheInterface $cache): JsonResponse
     {
+        $cache->invalidateTags(["countriesCache"]);
         $entityManager->remove($country);
         $entityManager->flush();
         return new JsonResponse(null, Response::HTTP_NO_CONTENT, []);
