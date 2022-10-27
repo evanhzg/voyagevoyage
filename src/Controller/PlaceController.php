@@ -75,8 +75,8 @@ class PlaceController extends AbstractController
     #[ParamConverter("place", options : ["id"=>"idPlace"])]
     public function deleteCity(Place $place, EntityManagerInterface $entityManager) :JsonResponse
     {
-         $place->setStatus(false);
-         $entityManager->flush();
+        $place->setStatus(false);
+        $entityManager->flush();
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
 
