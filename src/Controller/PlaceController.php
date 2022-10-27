@@ -109,13 +109,15 @@ class PlaceController extends AbstractController
      * @param SerializerInterface $serializer
      * @return JsonResponse
      */
-    #[Route('/api/place/', name: 'place.update', methods: ['PUT'])]
-    #[ParamConverter("placeName", options : ["id"=>"idPlace"])]
-    public function updatePlace(Place $place, Request $request, EntityManager $entityManager, SerializerInterface $serializer):JsonResponse
+    #[Route('/api/place/{idPlace}', name: 'place.update', methods: ['PUT'])]
+    #[ParamConverter("place", options : ["id"=>"idPlace"])]
+    public function updatePlace(Place $place, Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer):JsonResponse
     {
-        $placeUpdate = $serializer->deserialize($request->getContent(), Place::class, 'json',
-        [AbstractNormalizer::OBJECT_TO_POPULATE=> $place]);
-        $request->toArray();   //i don't know if it's correct :)
+        $placeUpdate = $serializer->deserialize(
+            $request->getContent(),
+            Place::class, 
+            'json', 
+            [AbstractNormalizer::OBJECT_TO_POPULATE=> $place]);
         $placeUpdate->setStatus(true);
         $entityManager->persist($place);
         $entityManager->flush();
