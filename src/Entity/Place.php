@@ -4,7 +4,7 @@ namespace App\Entity;
 
 use App\Repository\PlaceRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Jms\Serializer\Annotation\Groups;
 use Doctrine\DBAL\Types\Types;
 # use Symfony\Component\Validator\Constraints as Asserts;
 
