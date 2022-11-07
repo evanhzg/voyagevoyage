@@ -2,20 +2,22 @@
 
 namespace App\Controller;
 
-use Doctrine\ORM\EntityManager;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
-use App\Entity\City;
-use App\Repository\CityRepository;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Serializer\SerializerInterface;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Faker\Generator;
 use Faker\Factory;
+use App\Entity\City;
+use Faker\Generator;
+use Doctrine\ORM\EntityManager;
+use App\Repository\CityRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use JMS\Serializer\SerializerInterface;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 // tooo tooooo
 
 class CityController extends AbstractController
@@ -45,6 +47,37 @@ class CityController extends AbstractController
         
         return new JsonResponse($jsonCity, Response::HTTP_OK, ['accept' => 'jsons'], true);
     }
+
+    /**
+     * Getting all the cities names including adding and correcting it in the reposetory
+     * 
+     * 
+     * @param City $city
+     * @param SerializerInterface $serializer
+     * @return JsonResponse
+     */  
+    public function getAllCities(Request $request, CityRepository $cityRepository, SerializerInterface $serializer, TagAwareCacheInterface $cache): JsonResponse
+    {
+        $page = $request->get('page', 1);
+        $limit = $request->get('limit', 10);
+        $cities = $cityRepository->findWithPagination($page, $limit);
+        $jsonCities = $cache->get("getAllCities", function (ItemInterface $item) use ($cities, $serializer) {
+            $item->tag("citiesCache");
+            return $serializer->serialize($cities, 'json', ["groups" => "getAllCountries"]);
+        });
+        return new JsonResponse($jsonCities, Response::HTTP_OK, [], true);
+    }
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * Deleting a city name

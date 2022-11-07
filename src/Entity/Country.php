@@ -7,11 +7,26 @@ use App\Repository\CountryRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation\Groups;
+use Hateoas\Configuration\Annotation as Hateoas;
+use OpenApi\Attributes;
+use OA\Property;
 
+
+/**
+ * @Hateoas\Relation(
+ *      "self",
+ *      href= @Hateoas\Route(
+ *          "countries.get",
+ *          parameters = {"idCountry" = "expr(object.getId())"}
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(groups="getAllCountries")
+ * )
+ */
 #[ORM\Entity(repositoryClass: CountryRepository::class)]
 class Country
-{
+{   
+    
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -39,6 +54,7 @@ class Country
     #[Groups(['getAllCountries', 'getCountry'])]
     #[Assert\NotNull(message: 'You must say if the country is part of EU.')]
     #[Assert\Type('boolean')]
+    #[Property(type: 'boolean')]
     private ?bool $european = null;
 
     #[ORM\Column]

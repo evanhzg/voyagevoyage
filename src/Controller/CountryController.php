@@ -11,13 +11,16 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Serializer\SerializerInterface;
+use JMS\Serializer\SerializerInterface;
+use JMS\Serializer\Serializer;
+use JMS\Serializer\SerializationContext;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
+use Symfony\Component\Serializer\SerializerInterface as SerializerSerializerInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
@@ -39,15 +42,19 @@ class CountryController extends AbstractController
      * @param SerializerInterface $serializer
      * @return JsonResponse
      */
+    //very importent a sa function!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     #[Route('/api/countries', name: 'countries.getAll', methods: ['GET'])]
-    public function getAllCountries(Request $request, CountryRepository $countryRepository, SerializerInterface $serializer, TagAwareCacheInterface $cache): JsonResponse
+    public function getAllCountries(Request $request, CountryRepository $countryRepository,SerializerInterface $serializer, TagAwareCacheInterface $cache): JsonResponse
     {
         $page = $request->get('page', 1);
         $limit = $request->get('limit', 10);
-        $countries = $countryRepository->findWithPagination($page, $limit);
-        $jsonCountries = $cache->get("getAllCountries", function (ItemInterface $item) use ($countries, $serializer) {
+        $jsonCountries = $cache->get("getAllCountries", function (ItemInterface $item) use ($countryRepository,$serializer, $page, $limit) {
             $item->tag("countriesCache");
-            return $serializer->serialize($countries, 'json', ["groups" => "getAllCountries"]);
+            $countries = $countryRepository->findWithPagination($page, $limit);
+
+            $context = SerializationContext::create()->setGroups("getAllCountries");
+
+            return $serializer->serialize($countries, 'json', $context);
         });
         return new JsonResponse($jsonCountries, Response::HTTP_OK, [], true);
     }
@@ -126,20 +133,23 @@ class CountryController extends AbstractController
             $request->getContent(),
             Country::class,
             'json',
-            [AbstractNormalizer::OBJECT_TO_POPULATE => $country] 
         );
         $updateCountry->setStatus(true);
         $content = $request->toArray();
+        $country->setName($updateCountry->getName() ?? $country->getName());
         $capitalId = $content['capitalId'] ?? $country->getCapital()->getId();
         $country->setCapital($cityRepository->find($capitalId));
+        $country->setEuropean($updateCountry->isEuropean() ?? $country->isEuropean());
+        $country->setLanguages($updateCountry->getLanguages() ?? $country->getLanguages());
         $errors = $validator->validate($country);
         if($errors->count() > 0){
             return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);    
         }
         $entityManager->persist($country);
         $entityManager->flush();
-        $jsonCountry = $serializer->serialize($updateCountry, 'json', ['groups' => "getCountry"]);
-        $location = $urlGeneratorInterface->generate('countries.get', ['idCountry' => $updateCountry->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+        $context = SerializationContext::create()->setGroups(["getCountry"]);
+        $jsonCountry = $serializer->serialize($country, 'json', $context);
+        $location = $urlGeneratorInterface->generate('countries.get', ['idCountry' => $country->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
         return new JsonResponse($jsonCountry, Response::HTTP_CREATED, ["Location" => $location], true);
     }
 
