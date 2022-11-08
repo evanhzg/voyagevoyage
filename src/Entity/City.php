@@ -2,12 +2,16 @@
 
 namespace App\Entity;
 
-use App\Repository\CityRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation\Groups;
+use Assert\NotNull;
+use App\Entity\Place;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use App\Repository\CityRepository;
+use JMS\Serializer\Annotation\Type;
+use JMS\Serializer\Annotation\Groups;
+use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Config\Builder\Property;
+use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: CityRepository::class)]
 class City
@@ -34,6 +38,13 @@ class City
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups(['getAllCities', 'getCity', 'getCountry'])]
     private ?string $description = null;
+
+    #[ORM\Column]
+    #[Groups(['getAllCountries', 'getCountry'])]
+    #[NotNull(message: 'You must say if the country is part of EU.')]
+    #[Type('boolean')]
+    #[Property(type: 'boolean')]
+    private ?bool $european = null;
 
     #[ORM\Column]
     private ?bool $status = null;
@@ -132,6 +143,29 @@ class City
         return $this;
     }
 
+    public function getLanguages(): ?string
+    {
+        return $this->languages;
+    }
+
+    public function setLanguages(?string $languages): self
+    {
+        $this->languages = $languages;
+
+        return $this;
+    }
+
+    public function isEuropean(): ?bool
+    {
+        return $this->european;
+    }
+
+    public function setEuropean(bool $european): self
+    {
+        $this->european = $european;
+
+        return $this;
+    }
     public function removePlace(Place $place): self
     {
         if ($this->places->removeElement($place)) {

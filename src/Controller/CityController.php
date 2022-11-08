@@ -7,14 +7,16 @@ use App\Entity\City;
 use Faker\Generator;
 use Doctrine\ORM\EntityManager;
 use App\Repository\CityRepository;
+use JMS\Serializer\SerializerInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use JMS\Serializer\SerializationContext;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use JMS\Serializer\SerializerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
@@ -63,21 +65,105 @@ class CityController extends AbstractController
         $cities = $cityRepository->findWithPagination($page, $limit);
         $jsonCities = $cache->get("getAllCities", function (ItemInterface $item) use ($cities, $serializer) {
             $item->tag("citiesCache");
-            return $serializer->serialize($cities, 'json', ["groups" => "getAllCountries"]);
+            return $serializer->serialize($cities, 'json', ["groups" => "getAllCities"]);
         });
         return new JsonResponse($jsonCities, Response::HTTP_OK, [], true);
     }
 
+     /**
+     * Adding a city name
+     * 
+     * 
+     * @param City $city
+     * @param SerializerInterface $serializer
+     * @return JsonResponse
+     */
+    #[Route('/api/city/', name: 'city.turnOff', methods: ['POST'])]  // here shouldn't it be city.creat ?
+    public function addCity(Request $request, EntityManager $entityManager, SerializerInterface $serializer):JsonResponse
+    {
+        $city = $serializer->deserialize($request->getContent(), City::class, 'json');
+        $city->setStatus(true);
+        $entityManager->persist($city);
+        $entityManager->flush();
+        $jsonCity = $serializer->serialize($city, 'json');
+        return new JsonResponse($jsonCity, Response::HTTP_CREATED, [], true);
+    }
+    
+     /**
+     * Path that creates a city then returns it
+     * 
+     * @param Request $request
+     * @param EntityManagerInterface $entityManager
+     * @param SerializerInterface $serializer
+     * @param SerializerInterface $serializer
+     * @param UrlGeneratorInterface $urlGeneratorInterface
+     * @param ValidatorInterface $validator
+     * @return JsonResponse
+     */
+    #[Route('/api/city', name: 'city.create', methods:['POST'])]
+    public function createCity(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer, UrlGeneratorInterface $urlGeneratorInterface, ValidatorInterface $validator): JsonResponse
+    {
+        $city = $serializer->deserialize(
+            $request->getContent(),
+            City::class,
+            'json'
+        );
+        $city->setStatus(true);
+        $errors = $validator->validate($city);
+        if($errors->count() > 0){
+            return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);    
+        }
+        $entityManager->persist($city);
+        $entityManager->flush();
+        $jsonCity = $serializer->serialize($city, 'json', ['groups' => "getCity"]);
+        $location = $urlGeneratorInterface->generate('city.get', ['idCity' => $city->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+        return new JsonResponse($jsonCity , Response::HTTP_CREATED, ["Location" => $location], true);
+    }
 
+    /**
+     * Path that updates a city
+     * 
+     * @param Request $request
+     * @param City $city
+     * @param CityRepository $cityRepository
+     * @param EntityManagerInterface $entityManager
+     * @param SerializerInterface $serializer
+     * @param SerializerInterface $serializer
+     * @param UrlGeneratorInterface $urlGeneratorInterface
+     * @param ValidatorInterface $validator
+     * @return JsonResponse
+     */
+    #[Route('/api/city/{idCity}', name: 'city.update', methods:['PATCH'])]
+    #[ParamConverter('city', options: ['id' => 'idCity'])]
+    public function updateCountry(Request $request, City $city, CityRepository $cityRepository, EntityManagerInterface $entityManager, SerializerInterface $serializer, UrlGeneratorInterface $urlGeneratorInterface, ValidatorInterface $validator): JsonResponse
+    {
+        if(!$city->isStatus()){
+            return new JsonResponse(null, Response::HTTP_NOT_FOUND, []);
+        }
 
-
-
-
-
-
-
-
-
+        $updateCity = $serializer->deserialize(
+            $request->getContent(),
+            City::class,
+            'json',
+        );
+        $updateCity->setStatus(true);
+        $content = $request->toArray();
+        $city->setName($updateCity->getName() ?? $city->getName());
+        $city->setDescription($updateCity->getDescriptopn() ?? $city->getDescription());
+        $city->setPopulation($updateCity->getPopulation() ?? $city->getPopulation());
+        $city->setEuropean($updateCity->isEuropean() ?? $city->isEuropean());
+        $city->setLanguages($updateCity->getLanguages() ?? $city->getLanguages());
+        $errors = $validator->validate($city);
+        if($errors->count() > 0){
+            return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);    
+        }
+        $entityManager->persist($city);
+        $entityManager->flush();
+        $context = SerializationContext::create()->setGroups(["getCity"]);
+        $jsonCity = $serializer->serialize($city, 'json', $context);
+        $location = $urlGeneratorInterface->generate('city.get', ['idCity' => $city->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+        return new JsonResponse($jsonCity, Response::HTTP_CREATED, ["Location" => $location], true);
+    }
 
     /**
      * Deleting a city name
@@ -96,6 +182,22 @@ class CityController extends AbstractController
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
 
+    }
+
+    /**
+     * Path to deactivates a city
+     * 
+     * @param City $city
+     * @param EntityManagerInterface $entityManager
+     * @return JsonResponse
+     */
+    #[Route('/api/city/{idCity}', name: 'city.delete', methods:['DELETE'])]
+    #[ParamConverter('country', options: ['id' => 'idCity'])]
+    public function deactivateCity(City $city, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $city->setStatus(false);
+        $entityManager->flush();
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT, []);
     }
 
     
