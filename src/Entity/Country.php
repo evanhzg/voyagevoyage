@@ -2,33 +2,62 @@
 
 namespace App\Entity;
 
-use App\Repository\CountryRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use OpenApi\Attributes;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
+use OpenApi\Attributes\Property;
+use App\Repository\CountryRepository;
+use JMS\Serializer\Annotation\Groups;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Symfony\Component\Validator\Constraints as Assert;
+use OpenApi\Annotations as OA;
 
+
+
+/**
+ * @Hateoas\Relation(
+ *      "self",
+ *      href= @Hateoas\Route(
+ *          "countries.get",
+ *          parameters = {"idCountry" = "expr(object.getId())"}
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(groups="getAllCountries")
+ * )
+ */
 #[ORM\Entity(repositoryClass: CountryRepository::class)]
 class Country
-{
+{   
+    
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['getAllCountries', 'getCountry'])]
+    #[Groups(['getAllCountries', 'getCountry', 'getCity', 'getCities'])]
     private ?int $id = null;
-
+    
     #[ORM\Column(length: 255)]
-    #[Groups(['getAllCountries', 'getCountry'])]
+    #[Groups(['getAllCountries', 'getCountry', 'getCity', 'getCities'])]
+    #[Assert\Sequentially([
+        new Assert\NotBlank(message: 'You must give the country a name.'),
+        new Assert\Type('string'),
+        new Assert\Length(min: 1, max: 255)
+    ])]
     private ?string $name = null;
 
-    #[ORM\Column(length: 5, nullable: true)]
-    private ?string $language = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['getAllCountries', 'getCountry','getCity', 'getCities'])]
+    #[Assert\Sequentially([
+        new Assert\Type('string'),
+        new Assert\Length(min: 1, max: 255)
+    ])]
+    private ?string $languages = null;
 
     #[ORM\Column]
+    #[Groups(['getAllCountries', 'getCountry', 'getCity', 'getCities'])]
+    #[Assert\NotNull(message: 'You must say if the country is part of EU.')]
+    #[Assert\Type('boolean')]
+    #[Property(type: 'boolean')]
     private ?bool $european = null;
-
-    #[ORM\Column(length: 6)]
-    private ?string $time_zone = null;
 
     #[ORM\Column]
     private ?bool $status = null;
@@ -63,14 +92,14 @@ class Country
         return $this;
     }
 
-    public function getLanguage(): ?string
+    public function getLanguages(): ?string
     {
-        return $this->language;
+        return $this->languages;
     }
 
-    public function setLanguage(?string $language): self
+    public function setLanguages(?string $languages): self
     {
-        $this->language = $language;
+        $this->languages = $languages;
 
         return $this;
     }
@@ -83,18 +112,6 @@ class Country
     public function setEuropean(bool $european): self
     {
         $this->european = $european;
-
-        return $this;
-    }
-
-    public function getTimeZone(): ?string
-    {
-        return $this->time_zone;
-    }
-
-    public function setTimeZone(string $time_zone): self
-    {
-        $this->time_zone = $time_zone;
 
         return $this;
     }

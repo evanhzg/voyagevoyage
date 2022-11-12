@@ -2,12 +2,16 @@
 
 namespace App\Entity;
 
-use App\Repository\CityRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Assert\NotNull;
+use App\Entity\Place;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use App\Repository\CityRepository;
+use JMS\Serializer\Annotation\Type;
+use JMS\Serializer\Annotation\Groups;
+use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Config\Builder\Property;
+use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: CityRepository::class)]
 class City
@@ -15,11 +19,11 @@ class City
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['getAllCities', 'getCity'])]
+    #[Groups(['getAllCities', 'getCity', 'getCountry', 'getAllCountries'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['getAllCities', 'getCity'])]
+    #[Groups(['getAllCities', 'getCity', 'getCountry', 'getAllCountries'])]
     private ?string $name = null;
 
     #[ORM\ManyToOne(inversedBy: 'cities')]
@@ -28,17 +32,23 @@ class City
     private ?Country $country = null;
 
     #[ORM\Column]
-    #[Groups(['getAllCities', 'getCity'])]
+    #[Groups(['getAllCities', 'getCity', 'getCountry'])]
     private ?int $population = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['getAllCities', 'getCity', 'getCountry'])]
     private ?string $description = null;
+
+   
 
     #[ORM\Column]
     private ?bool $status = null;
 
     #[ORM\OneToMany(mappedBy: 'city', targetEntity: Place::class)]
     private Collection $places;
+
+    #[ORM\Column(length: 6, nullable: true)]
+    private ?string $time_zone = null;
 
     public function __construct()
     {
@@ -128,6 +138,33 @@ class City
         return $this;
     }
 
+    public function getLanguages(): ?string
+    {
+        return $this->languages;
+    }
+
+    public function setLanguages(?string $languages): self
+    {
+        $this->languages = $languages;
+
+        return $this;
+    }
+
+    public function isEuropean(): ?bool
+    {
+        return $this->european;
+    }
+
+    /**
+     * @param bool $european
+     * @return $this
+     */
+    public function setEuropean(bool $european): self
+    {
+        $this->european = $european;
+
+        return $this;
+    }
     public function removePlace(Place $place): self
     {
         if ($this->places->removeElement($place)) {
@@ -136,6 +173,18 @@ class City
                 $place->setCity(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getTimeZone(): ?string
+    {
+        return $this->time_zone;
+    }
+
+    public function setTimeZone(?string $time_zone): self
+    {
+        $this->time_zone = $time_zone;
 
         return $this;
     }
