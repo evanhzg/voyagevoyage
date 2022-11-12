@@ -7,8 +7,8 @@ use App\Repository\CountryRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
-use JMS\Serializer\Annotation\Groups;
 use Hateoas\Configuration\Annotation as Hateoas;
+use JMS\Serializer\Annotation\Groups;
 use OpenApi\Attributes;
 use OpenApi\Annotations as OA;
 use OA\Property;
@@ -16,11 +16,41 @@ use OA\Property;
 /**
  * @Hateoas\Relation(
  *      "self",
- *      href= @Hateoas\Route(
+ *      href=@Hateoas\Route(
  *          "countries.get",
  *          parameters = {"idCountry" = "expr(object.getId())"}
  *      ),
- *      exclusion = @Hateoas\Exclusion(groups=" ")
+ *      exclusion = @Hateoas\Exclusion(groups="getAllCountries")
+ * )
+ * @Hateoas\Relation(
+ *      "collection",
+ *      href= @Hateoas\Route(
+ *          "countries.getAll",
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(groups="getAllCountries")
+ * )
+ * @Hateoas\Relation(
+ *      "create",
+ *      href= @Hateoas\Route(
+ *          "countries.create"
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(groups="getAllCountries")
+ * )
+ * @Hateoas\Relation(
+ *      "update",
+ *      href= @Hateoas\Route(
+ *          "countries.update",
+ *          parameters = {"idCountry" = "expr(object.getId())"}
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(groups="getAllCountries")
+ * )
+ * @Hateoas\Relation(
+ *      "remove",
+ *      href= @Hateoas\Route(
+ *          "countries.delete",
+ *          parameters = {"idCountry" = "expr(object.getId())"}
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(groups="getAllCountries")
  * )
  */
 #[ORM\Entity(repositoryClass: CountryRepository::class)]
