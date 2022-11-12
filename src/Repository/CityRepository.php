@@ -39,6 +39,15 @@ class CityRepository extends ServiceEntityRepository
         }
     }
 
+    public function findWithPagination(int $page, int $limit){
+        return $this->createQueryBuilder('c')
+            ->setMaxResults($limit)
+            ->setFirstResult(($page - 1) * $limit)
+            ->where('c.status = true')
+            ->getQuery()
+            ->getResult();
+    }
+    
 //    /**
 //     * @return City[] Returns an array of City objects
 //     */
