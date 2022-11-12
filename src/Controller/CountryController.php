@@ -71,6 +71,7 @@ class CountryController extends AbstractController
      * Path that creates a country then returns it
      * 
      * @param Request $request
+     * @param CityRepository $cityRepository
      * @param EntityManagerInterface $entityManager
      * @param SerializerInterface $serializer
      * @param SerializerInterface $serializer
@@ -79,7 +80,7 @@ class CountryController extends AbstractController
      * @return JsonResponse
      */
     #[Route('/api/countries', name: 'countries.create', methods:['POST'])]
-    public function createCountry(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer, UrlGeneratorInterface $urlGeneratorInterface, ValidatorInterface $validator): JsonResponse
+    public function createCountry(Request $request, CityRepository $cityRepository, EntityManagerInterface $entityManager, SerializerInterface $serializer, UrlGeneratorInterface $urlGeneratorInterface, ValidatorInterface $validator): JsonResponse
     {
         $country = $serializer->deserialize(
             $request->getContent(),
@@ -87,6 +88,9 @@ class CountryController extends AbstractController
             'json'
         );
         $country->setStatus(true);
+        $content = $request->toArray();
+        $capitalId = $content['capitalId'] ?? 0;
+        $country->setCapital($cityRepository->find($capitalId));
         $errors = $validator->validate($country);
         if($errors->count() > 0){
             return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);    
@@ -125,7 +129,7 @@ class CountryController extends AbstractController
             Country::class,
             'json',
         );
-        $updateCountry->setStatus(true);
+        $country->setStatus(true);
         $content = $request->toArray();
         $country->setName($updateCountry->getName() ?? $country->getName());
         $capitalId = $content['capitalId'] ?? $country->getCapital()->getId();

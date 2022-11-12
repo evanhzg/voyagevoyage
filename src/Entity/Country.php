@@ -9,9 +9,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 use Hateoas\Configuration\Annotation as Hateoas;
 use JMS\Serializer\Annotation\Groups;
-use OpenApi\Attributes;
-use OpenApi\Annotations as OA;
-use OA\Property;
 
 /**
  * @Hateoas\Relation(
@@ -20,21 +17,21 @@ use OA\Property;
  *          "countries.get",
  *          parameters = {"idCountry" = "expr(object.getId())"}
  *      ),
- *      exclusion = @Hateoas\Exclusion(groups="getAllCountries")
+ *      exclusion = @Hateoas\Exclusion(groups={"getAllCountries", "getCountry"})
  * )
  * @Hateoas\Relation(
  *      "collection",
  *      href= @Hateoas\Route(
  *          "countries.getAll",
  *      ),
- *      exclusion = @Hateoas\Exclusion(groups="getAllCountries")
+ *      exclusion = @Hateoas\Exclusion(groups={"getAllCountries", "getCountry"})
  * )
  * @Hateoas\Relation(
  *      "create",
  *      href= @Hateoas\Route(
  *          "countries.create"
  *      ),
- *      exclusion = @Hateoas\Exclusion(groups="getAllCountries")
+ *      exclusion = @Hateoas\Exclusion(groups={"getAllCountries", "getCountry"})
  * )
  * @Hateoas\Relation(
  *      "update",
@@ -42,7 +39,7 @@ use OA\Property;
  *          "countries.update",
  *          parameters = {"idCountry" = "expr(object.getId())"}
  *      ),
- *      exclusion = @Hateoas\Exclusion(groups="getAllCountries")
+ *      exclusion = @Hateoas\Exclusion(groups={"getAllCountries", "getCountry"})
  * )
  * @Hateoas\Relation(
  *      "remove",
@@ -50,7 +47,7 @@ use OA\Property;
  *          "countries.delete",
  *          parameters = {"idCountry" = "expr(object.getId())"}
  *      ),
- *      exclusion = @Hateoas\Exclusion(groups="getAllCountries")
+ *      exclusion = @Hateoas\Exclusion(groups={"getAllCountries", "getCountry"})
  * )
  */
 #[ORM\Entity(repositoryClass: CountryRepository::class)]
@@ -84,7 +81,6 @@ class Country
     #[Groups(['getAllCountries', 'getCountry', 'getCity'])]
     #[Assert\NotNull(message: 'You must say if the country is part of EU.')]
     #[Assert\Type('boolean')]
-    #[Property(type: 'boolean')]
     private ?bool $european = null;
 
     #[ORM\Column]

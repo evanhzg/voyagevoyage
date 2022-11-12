@@ -2,17 +2,55 @@
 
 namespace App\Entity;
 
-use App\Repository\CityRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\CityRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints as Assert;
 use Hateoas\Configuration\Annotation as Hateoas;
 use JMS\Serializer\Annotation\Groups;
-use OpenApi\Attributes;
-use OpenApi\Annotations as OA;
-use OA\Property;
 use Doctrine\DBAL\Types\Types;
 
+/**
+ * @Hateoas\Relation(
+ *      "self",
+ *      href=@Hateoas\Route(
+ *          "cities.get",
+ *          parameters = {"idCity" = "expr(object.getId())"}
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(groups={"getAllCities", "getCity"})
+ * )
+ * @Hateoas\Relation(
+ *      "collection",
+ *      href= @Hateoas\Route(
+ *          "cities.getAll",
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(groups={"getAllCities", "getCity"})
+ * )
+ * @Hateoas\Relation(
+ *      "create",
+ *      href= @Hateoas\Route(
+ *          "cities.create"
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(groups={"getAllCities", "getCity"})
+ * )
+ * @Hateoas\Relation(
+ *      "update",
+ *      href= @Hateoas\Route(
+ *          "cities.update",
+ *          parameters = {"idCity" = "expr(object.getId())"}
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(groups={"getAllCities", "getCity"})
+ * )
+ * @Hateoas\Relation(
+ *      "remove",
+ *      href= @Hateoas\Route(
+ *          "cities.delete",
+ *          parameters = {"idCity" = "expr(object.getId())"}
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(groups={"getAllCities", "getCity"})
+ * )
+ */
 #[ORM\Entity(repositoryClass: CityRepository::class)]
 class City
 {
@@ -24,6 +62,11 @@ class City
 
     #[ORM\Column(length: 255)]
     #[Groups(['getAllCities', 'getCity', 'getCountry', 'getAllCountries'])]
+    #[Assert\Sequentially([
+        new Assert\NotBlank(message: 'You must give the city a name.'),
+        new Assert\Type('string'),
+        new Assert\Length(min: 1, max: 255)
+    ])]
     private ?string $name = null;
 
     #[ORM\ManyToOne(inversedBy: 'cities')]
@@ -33,10 +76,16 @@ class City
 
     #[ORM\Column]
     #[Groups(['getAllCities', 'getCity', 'getCountry'])]
+    #[Assert\Sequentially([
+        new Assert\Type('integer')
+    ])]
     private ?int $population = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups(['getAllCities', 'getCity', 'getCountry'])]
+    #[Assert\Sequentially([
+        new Assert\Type('string')
+    ])]
     private ?string $description = null;
 
     #[ORM\Column]
