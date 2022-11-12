@@ -160,6 +160,10 @@ class City
         return $this->european;
     }
 
+    /**
+     * @param bool $european
+     * @return $this
+     */
     public function setEuropean(bool $european): self
     {
         $this->european = $european;

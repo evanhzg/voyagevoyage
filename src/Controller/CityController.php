@@ -20,7 +20,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-// tooo tooooo
 
 class CityController extends AbstractController
 {
@@ -135,7 +134,7 @@ class CityController extends AbstractController
      */
     #[Route('/api/city/{idCity}', name: 'city.update', methods:['PATCH'])]
     #[ParamConverter('city', options: ['id' => 'idCity'])]
-    public function updateCountry(Request $request, City $city, CityRepository $cityRepository, EntityManagerInterface $entityManager, SerializerInterface $serializer, UrlGeneratorInterface $urlGeneratorInterface, ValidatorInterface $validator): JsonResponse
+    public function updateCity(Request $request, City $city, EntityManagerInterface $entityManager, SerializerInterface $serializer, UrlGeneratorInterface $urlGeneratorInterface, ValidatorInterface $validator): JsonResponse
     {
         if(!$city->isStatus()){
             return new JsonResponse(null, Response::HTTP_NOT_FOUND, []);
@@ -146,22 +145,25 @@ class CityController extends AbstractController
             City::class,
             'json',
         );
+
         $updateCity->setStatus(true);
-        $content = $request->toArray();
+
         $city->setName($updateCity->getName() ?? $city->getName());
-        $city->setDescription($updateCity->getDescriptopn() ?? $city->getDescription());
+        $city->setDescription($updateCity->getDescription() ?? $city->getDescription());
         $city->setPopulation($updateCity->getPopulation() ?? $city->getPopulation());
-        $city->setEuropean($updateCity->isEuropean() ?? $city->isEuropean());
-        $city->setLanguages($updateCity->getLanguages() ?? $city->getLanguages());
         $errors = $validator->validate($city);
+
         if($errors->count() > 0){
-            return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);    
+            return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);
         }
+
         $entityManager->persist($city);
         $entityManager->flush();
+
         $context = SerializationContext::create()->setGroups(["getCity"]);
         $jsonCity = $serializer->serialize($city, 'json', $context);
         $location = $urlGeneratorInterface->generate('city.get', ['idCity' => $city->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+
         return new JsonResponse($jsonCity, Response::HTTP_CREATED, ["Location" => $location], true);
     }
 
@@ -191,8 +193,8 @@ class CityController extends AbstractController
      * @param EntityManagerInterface $entityManager
      * @return JsonResponse
      */
-    #[Route('/api/city/{idCity}', name: 'city.delete', methods:['DELETE'])]
-    #[ParamConverter('country', options: ['id' => 'idCity'])]
+    #[Route('/api/city/{idCity}', name: 'city.delete', methods:['UPDATE'])]
+    #[ParamConverter('city', options: ['id' => 'idCity'])]
     public function deactivateCity(City $city, EntityManagerInterface $entityManager): JsonResponse
     {
         $city->setStatus(false);

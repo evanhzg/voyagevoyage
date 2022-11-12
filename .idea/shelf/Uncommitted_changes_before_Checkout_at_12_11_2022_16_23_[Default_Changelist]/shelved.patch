@@ -1,0 +1,207 @@
+Index: src/Controller/CityController.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?php\n\nnamespace App\\Controller;\n\nuse Doctrine\\ORM\\EntityManager;\nuse Symfony\\Bundle\\FrameworkBundle\\Controller\\AbstractController;\nuse Symfony\\Component\\HttpFoundation\\JsonResponse;\nuse Symfony\\Component\\HttpFoundation\\Request;\nuse Symfony\\Component\\Routing\\Annotation\\Route;\nuse App\\Entity\\City;\nuse App\\Repository\\CityRepository;\nuse Sensio\\Bundle\\FrameworkExtraBundle\\Configuration\\ParamConverter;\nuse Symfony\\Component\\HttpFoundation\\Response;\nuse Symfony\\Component\\Serializer\\SerializerInterface;\nuse Doctrine\\ORM\\EntityManagerInterface;\nuse Symfony\\Component\\Routing\\Generator\\UrlGeneratorInterface;\nuse Faker\\Generator;\nuse Faker\\Factory;\n// tooo tooooo\n\nclass CityController extends AbstractController\n{\n    #[Route('/city', name: 'app_city')]\n    public function index(): JsonResponse\n    {\n        return $this->json([\n            'message' => 'Welcome to your new controller!',\n            'path' => 'src/Controller/CityController.php',\n        ]);\n    }\n\n    /**\n     * Get a city depending of the given id\n     * \n     * \n     * @param City $city\n     * @param SerializerInterface $serializer\n     * @return JsonResponse\n     */\n    #[Route(\"/api/cities/{idCity}\", name: \"city.get\", methods: ['GET'])]\n    #[ParamConverter(\"city\", options: [\"id\" =>\"idCity\"])]\n    public function getCity(City $city, SerializerInterface $serializer): JsonResponse\n    {\n        $jsonCity = $serializer->serialize($city, 'json', [\"groups\" => 'getCity']);\n        \n        return new JsonResponse($jsonCity, Response::HTTP_OK, ['accept' => 'jsons'], true);\n    }\n\n    /**\n     * Deleting a city name\n     * \n     * \n     * @param City $city\n     * @param SerializerInterface $serializer\n     * @return JsonResponse\n     */    \n    #[Route('/api/city/{idCity}', name: 'city.delete', methods: ['DELETE'])]\n    #[ParamConverter(\"city\", options : [\"id\"=>\"idCity\"])]\n    public function deleteCity(City $city, EntityManagerInterface $entityManager) :JsonResponse\n    {\n         $city->setStatus(false);\n         $entityManager->flush();\n\n        return new JsonResponse(null, Response::HTTP_NO_CONTENT);\n\n    }\n\n    \n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/Controller/CityController.php b/src/Controller/CityController.php
+--- a/src/Controller/CityController.php	(revision 7575058edb78fb99ceb19dca4ff266b391c2f2d3)
++++ b/src/Controller/CityController.php	(date 1666964400093)
+@@ -2,21 +2,20 @@
+ 
+ namespace App\Controller;
+ 
++use Faker\Factory;
++use App\Entity\City;
++use Faker\Generator;
+ use Doctrine\ORM\EntityManager;
+-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+-use Symfony\Component\HttpFoundation\JsonResponse;
+-use Symfony\Component\HttpFoundation\Request;
+-use Symfony\Component\Routing\Annotation\Route;
+-use App\Entity\City;
+ use App\Repository\CityRepository;
+-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
++use Doctrine\ORM\EntityManagerInterface;
++use Symfony\Component\HttpFoundation\Request;
+ use Symfony\Component\HttpFoundation\Response;
++use Symfony\Component\Routing\Annotation\Route;
++use Symfony\Component\HttpFoundation\JsonResponse;
+ use Symfony\Component\Serializer\SerializerInterface;
+-use Doctrine\ORM\EntityManagerInterface;
+ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+-use Faker\Generator;
+-use Faker\Factory;
+-// tooo tooooo
++use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
++use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+ 
+ class CityController extends AbstractController
+ {
+Index: src/Entity/Country.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?php\n\nnamespace App\\Entity;\n\nuse Doctrine\\ORM\\Mapping as ORM;\nuse App\\Repository\\CountryRepository;\nuse Doctrine\\Common\\Collections\\Collection;\nuse Doctrine\\Common\\Collections\\ArrayCollection;\nuse Symfony\\Component\\Validator\\Constraints as Assert;\nuse Hateoas\\Configuration\\Annotation as Hateoas;\nuse JMS\\Serializer\\Annotation\\Groups;\n\n/**\n * @Hateoas\\Relation(\n *      \"self\",\n *      href= @Hateoas\\Route(\n *          \"countries.get\",\n *          parameters = {\"idCountry\" = \"expr(object.getId())\"}\n *      ),\n *      exclusion = @Hateoas\\Exclusion(groups=\"getAllCountries\")\n * )\n * @Hateoas\\Relation(\n *      \"collection\",\n *      href= @Hateoas\\Route(\n *          \"countries.getAll\",\n *          parameters = {\"idCountry\" = \"expr(object.getId())\"}\n *      ),\n *      exclusion = @Hateoas\\Exclusion(groups=\"getAllCountries\")\n * )\n * @Hateoas\\Relation(\n *      \"create\",\n *      href= @Hateoas\\Route(\n *          \"countries.create\"\n *      ),\n *      exclusion = @Hateoas\\Exclusion(groups=\"getAllCountries\")\n * )\n * @Hateoas\\Relation(\n *      \"update\",\n *      href= @Hateoas\\Route(\n *          \"countries.update\",\n *          parameters = {\"idCountry\" = \"expr(object.getId())\"}\n *      ),\n *      exclusion = @Hateoas\\Exclusion(groups=\"getAllCountries\")\n * )\n * @Hateoas\\Relation(\n *      \"remove\",\n *      href= @Hateoas\\Route(\n *          \"countries.delete\",\n *          parameters = {\"idCountry\" = \"expr(object.getId())\"}\n *      ),\n *      exclusion = @Hateoas\\Exclusion(groups=\"getAllCountries\")\n * )\n */\n#[ORM\\Entity(repositoryClass: CountryRepository::class)]\nclass Country\n{\n    #[ORM\\Id]\n    #[ORM\\GeneratedValue]\n    #[ORM\\Column]\n    #[Groups(['getAllCountries', 'getCountry'])]\n    private ?int $id = null;\n    \n    #[ORM\\Column(length: 255)]\n    #[Groups(['getAllCountries', 'getCountry'])]\n    #[Assert\\Sequentially([\n        new Assert\\NotBlank(message: 'You must give the country a name.'),\n        new Assert\\Type('string'),\n        new Assert\\Length(min: 1, max: 255)\n    ])]\n    private ?string $name = null;\n\n    #[ORM\\Column(length: 255, nullable: true)]\n    #[Groups(['getAllCountries', 'getCountry'])]\n    #[Assert\\Sequentially([\n        new Assert\\Type('string'),\n        new Assert\\Length(min: 1, max: 255)\n    ])]\n    private ?string $languages = null;\n\n    #[ORM\\Column]\n    #[Groups(['getAllCountries', 'getCountry'])]\n    #[Assert\\NotNull(message: 'You must say if the country is part of EU.')]\n    #[Assert\\Type('boolean')]\n    private ?bool $european = null;\n\n    #[ORM\\Column]\n    private ?bool $status = null;\n\n    #[ORM\\OneToMany(mappedBy: 'country', targetEntity: City::class)]\n    private Collection $cities;\n\n    #[ORM\\OneToOne(cascade: ['persist', 'remove'])]\n    #[ORM\\JoinColumn(nullable: true, onDelete: \"CASCADE\")]\n    #[Groups(['getAllCountries', 'getCountry'])]\n    private ?City $capital = null;\n\n    public function __construct()\n    {\n        $this->cities = new ArrayCollection();\n    }\n\n    public function getId(): ?int\n    {\n        return $this->id;\n    }\n\n    public function getName(): ?string\n    {\n        return $this->name;\n    }\n\n    public function setName(string $name): self\n    {\n        $this->name = $name;\n\n        return $this;\n    }\n\n    public function getLanguages(): ?string\n    {\n        return $this->languages;\n    }\n\n    public function setLanguages(?string $languages): self\n    {\n        $this->languages = $languages;\n\n        return $this;\n    }\n\n    public function isEuropean(): ?bool\n    {\n        return $this->european;\n    }\n\n    public function setEuropean(bool $european): self\n    {\n        $this->european = $european;\n\n        return $this;\n    }\n\n    public function isStatus(): ?bool\n    {\n        return $this->status;\n    }\n\n    public function setStatus(bool $status): self\n    {\n        $this->status = $status;\n\n        return $this;\n    }\n\n    /**\n     * @return Collection<int, City>\n     */\n    public function getCities(): Collection\n    {\n        return $this->cities;\n    }\n\n    public function addCity(City $city): self\n    {\n        if (!$this->cities->contains($city)) {\n            $this->cities->add($city);\n            $city->setCountry($this);\n        }\n\n        return $this;\n    }\n\n    public function removeCity(City $city): self\n    {\n        if ($this->cities->removeElement($city)) {\n            // set the owning side to null (unless already changed)\n            if ($city->getCountry() === $this) {\n                $city->setCountry(null);\n            }\n        }\n\n        return $this;\n    }\n\n    public function getCapital(): ?City\n    {\n        return $this->capital;\n    }\n\n    public function setCapital(?City $capital): self\n    {\n        $this->capital = $capital;\n\n        return $this;\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/Entity/Country.php b/src/Entity/Country.php
+--- a/src/Entity/Country.php	(revision 7575058edb78fb99ceb19dca4ff266b391c2f2d3)
++++ b/src/Entity/Country.php	(date 1666964756074)
+@@ -75,6 +75,8 @@
+         new Assert\Type('string'),
+         new Assert\Length(min: 1, max: 255)
+     ])]
++    #[Property(type: 'string')]
++
+     private ?string $languages = null;
+ 
+     #[ORM\Column]
+Index: src/Entity/City.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?php\n\nnamespace App\\Entity;\n\nuse App\\Repository\\CityRepository;\nuse Doctrine\\Common\\Collections\\ArrayCollection;\nuse Doctrine\\Common\\Collections\\Collection;\nuse Doctrine\\ORM\\Mapping as ORM;\nuse Hateoas\\Configuration\\Annotation as Hateoas;\nuse JMS\\Serializer\\Annotation\\Groups;use Doctrine\\DBAL\\Types\\Types;\n\n#[ORM\\Entity(repositoryClass: CityRepository::class)]\nclass City\n{\n    #[ORM\\Id]\n    #[ORM\\GeneratedValue]\n    #[ORM\\Column]\n    #[Groups(['getAllCities', 'getCity', 'getCountry', 'getAllCountries'])]\n    private ?int $id = null;\n\n    #[ORM\\Column(length: 255)]\n    #[Groups(['getAllCities', 'getCity', 'getCountry', 'getAllCountries'])]\n    private ?string $name = null;\n\n    #[ORM\\ManyToOne(inversedBy: 'cities')]\n    #[ORM\\JoinColumn(nullable: false, onDelete: \"CASCADE\")]\n    #[Groups(['getAllCities', 'getCity'])]\n    private ?Country $country = null;\n\n    #[ORM\\Column]\n    #[Groups(['getAllCities', 'getCity', 'getCountry'])]\n    private ?int $population = null;\n\n    #[ORM\\Column(type: Types::TEXT, nullable: true)]\n    #[Groups(['getAllCities', 'getCity', 'getCountry'])]\n    private ?string $description = null;\n\n    #[ORM\\Column]\n    private ?bool $status = null;\n\n    #[ORM\\OneToMany(mappedBy: 'city', targetEntity: Place::class)]\n    private Collection $places;\n\n    #[ORM\\Column(length: 6, nullable: true)]\n    private ?string $time_zone = null;\n\n    public function __construct()\n    {\n        $this->places = new ArrayCollection();\n    }\n\n    public function getId(): ?int\n    {\n        return $this->id;\n    }\n\n    public function getName(): ?string\n    {\n        return $this->name;\n    }\n\n    public function setName(string $name): self\n    {\n        $this->name = $name;\n\n        return $this;\n    }\n\n    public function getCountry(): ?Country\n    {\n        return $this->country;\n    }\n\n    public function setCountry(?Country $country): self\n    {\n        $this->country = $country;\n\n        return $this;\n    }\n\n    public function getPopulation(): ?int\n    {\n        return $this->population;\n    }\n\n    public function setPopulation(int $population): self\n    {\n        $this->population = $population;\n\n        return $this;\n    }\n\n    public function getDescription(): ?string\n    {\n        return $this->description;\n    }\n\n    public function setDescription(?string $description): self\n    {\n        $this->description = $description;\n\n        return $this;\n    }\n\n    public function isStatus(): ?bool\n    {\n        return $this->status;\n    }\n\n    public function setStatus(bool $status): self\n    {\n        $this->status = $status;\n\n        return $this;\n    }\n\n    /**\n     * @return Collection<int, Place>\n     */\n    public function getPlaces(): Collection\n    {\n        return $this->places;\n    }\n\n    public function addPlace(Place $place): self\n    {\n        if (!$this->places->contains($place)) {\n            $this->places->add($place);\n            $place->setCity($this);\n        }\n\n        return $this;\n    }\n\n    public function removePlace(Place $place): self\n    {\n        if ($this->places->removeElement($place)) {\n            // set the owning side to null (unless already changed)\n            if ($place->getCity() === $this) {\n                $place->setCity(null);\n            }\n        }\n\n        return $this;\n    }\n\n    public function getTimeZone(): ?string\n    {\n        return $this->time_zone;\n    }\n\n    public function setTimeZone(?string $time_zone): self\n    {\n        $this->time_zone = $time_zone;\n\n        return $this;\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/Entity/City.php b/src/Entity/City.php
+--- a/src/Entity/City.php	(revision 7575058edb78fb99ceb19dca4ff266b391c2f2d3)
++++ b/src/Entity/City.php	(date 1666964688013)
+@@ -8,6 +8,8 @@
+ use Doctrine\ORM\Mapping as ORM;
+ use Hateoas\Configuration\Annotation as Hateoas;
+ use JMS\Serializer\Annotation\Groups;use Doctrine\DBAL\Types\Types;
++use OpenApi\Attributes;
++
+ 
+ #[ORM\Entity(repositoryClass: CityRepository::class)]
+ class City
+@@ -33,6 +35,7 @@
+ 
+     #[ORM\Column(type: Types::TEXT, nullable: true)]
+     #[Groups(['getAllCities', 'getCity', 'getCountry'])]
++    #[Property(type: 'string')]
+     private ?string $description = null;
+ 
+     #[ORM\Column]
+Index: src/Controller/PlaceController.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?php\n\nnamespace App\\Controller;\n\nuse Faker\\Factory;\nuse Faker\\Generator;\nuse App\\Entity\\Place;\nuse Doctrine\\ORM\\EntityManager;\nuse App\\Repository\\PlaceRepository;\nuse Doctrine\\ORM\\EntityManagerInterface;\nuse Symfony\\Component\\Serializer\\Serializer;\nuse Symfony\\Component\\HttpFoundation\\Request;\nuse Symfony\\Component\\HttpFoundation\\Response;\nuse Symfony\\Component\\Routing\\Annotation\\Route;\nuse Symfony\\Component\\HttpFoundation\\JsonResponse;\nuse Symfony\\Component\\Serializer\\SerializerInterface;\nuse Symfony\\Component\\Routing\\Generator\\UrlGeneratorInterface;\nuse Symfony\\Component\\Serializer\\Normalizer\\AbstractNormalizer;\nuse Symfony\\Bundle\\FrameworkBundle\\Controller\\AbstractController;\nuse Sensio\\Bundle\\FrameworkExtraBundle\\Configuration\\ParamConverter;\n\nclass PlaceController extends AbstractController\n{\n    #[Route('/place', name: 'app_place')]\n    public function index(): JsonResponse\n    {\n        return $this->json([\n            'message' => 'Welcome to your new controller!',\n            'path' => 'src/Controller/PlaceController.php',\n        ]);\n    }\n\n    /**\n     * Get a response containing each place in the database\n     * \n     * \n     * @param Country $country\n     * @param SerializerInterface $serializer\n     * @return JsonResponse\n     */\n    #[Route(\"/api/places\", name: \"place.getAll\")]\n    public function getAllPlaces(PlaceRepository $repository, SerializerInterface $serializerInterface): JsonResponse\n    {\n        $places = $repository->findAll();\n        $jsonPlaces = $serializerInterface->serialize($places, 'json', [\"groups\" => 'getAllPlaces']);\n        return new JsonResponse($jsonPlaces, Response::HTTP_OK,[], false);\n    }\n\n    /**\n     * Get a place based on the given id\n     * \n     * \n     * @param Place $place\n     * @param SerializerInterface $serializer\n     * @return JsonResponse\n     */\n    #[Route(\"/api/places/{idPlace}\", name: \"place.get\", methods: ['GET'])]\n    #[ParamConverter(\"place\", options: [\"id\" =>\"idPlace\"])]\n    public function getPlace(Place $place, SerializerInterface $serializer): JsonResponse\n    {\n        $jsonPlace = $serializer->serialize($place, 'json', [\"groups\" => 'getPlace']);\n        \n        return new JsonResponse($jsonPlace, Response::HTTP_OK, ['accept' => 'jsons'], true);\n    }\n\n    /**\n     * Deleting a place name\n     * \n     * \n     * @param Place $place\n     * @param SerializerInterface $serializer\n     * @return JsonResponse\n     */    \n    #[Route('/api/place/{idPlace}', name: 'place.delete', methods: ['DELETE'])]\n    #[ParamConverter(\"place\", options : [\"id\"=>\"idPlace\"])]\n    public function deleteCity(Place $place, EntityManagerInterface $entityManager) :JsonResponse\n    {\n        $place->setStatus(false);\n        $entityManager->flush();\n\n        return new JsonResponse(null, Response::HTTP_NO_CONTENT);\n\n    }\n\n    /**\n     * Adding a place name\n     * \n     * \n     * @param Place $place\n     * @param SerializerInterface $serializer\n     * @return JsonResponse\n     */\n    #[Route('/api/place/', name: 'place.turnOff', methods: ['POST'])]\n    public function addplace(Request $request, EntityManager $entityManager, SerializerInterface $serializer):JsonResponse\n    {\n        $place = $serializer->deserialize($request->getContent(), Place::class, 'json');\n        $place->setStatus(true);\n        $entityManager->persist($place);\n        $entityManager->flush();\n        $jsonPlace = $serializer->serialize($place, 'json');\n        return new JsonResponse($jsonPlace, Response::HTTP_CREATED, [], true);\n    }\n\n    /**\n     * updating a place (changing adress, etc...)\n     * \n     * \n     * @param Place $place\n     * @param SerializerInterface $serializer\n     * @return JsonResponse\n     */\n    #[Route('/api/place/', name: 'place.update', methods: ['PUT'])]\n    #[ParamConverter(\"placeName\", options : [\"id\"=>\"idPlace\"])]\n    public function updatePlace(Place $place, Request $request, EntityManager $entityManager, SerializerInterface $serializer):JsonResponse\n    {\n        $placeUpdate = $serializer->deserialize($request->getContent(), Place::class, 'json',\n        [AbstractNormalizer::OBJECT_TO_POPULATE=> $place]);\n        $request->toArray();   //i don't know if it's correct :)\n        $placeUpdate->setStatus(true);\n        $entityManager->persist($place);\n        $entityManager->flush();\n        $jsonPlace = $serializer->serialize($placeUpdate, 'json');\n        return new JsonResponse($jsonPlace, Response::HTTP_RESET_CONTENT, [], true);\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/Controller/PlaceController.php b/src/Controller/PlaceController.php
+--- a/src/Controller/PlaceController.php	(revision 7575058edb78fb99ceb19dca4ff266b391c2f2d3)
++++ b/src/Controller/PlaceController.php	(date 1666961971754)
+@@ -2,8 +2,8 @@
+ 
+ namespace App\Controller;
+ 
+-use Faker\Factory;
+ use Faker\Generator;
++use Faker\Factory;
+ use App\Entity\Place;
+ use Doctrine\ORM\EntityManager;
+ use App\Repository\PlaceRepository;
+Index: config/packages/nelmio_api_doc.yaml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>nelmio_api_doc:\n    documentation:\n        info:\n            title: Travel API\n            description: This is an API to gather informations about cool places in the world\n            version: 1.0.0\n    areas: # to filter documented areas\n        path_patterns:\n            - ^/api(?!/doc$) # Accepts routes under /api except /api/doc\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/config/packages/nelmio_api_doc.yaml b/config/packages/nelmio_api_doc.yaml
+--- a/config/packages/nelmio_api_doc.yaml	(revision 7575058edb78fb99ceb19dca4ff266b391c2f2d3)
++++ b/config/packages/nelmio_api_doc.yaml	(date 1666963423098)
+@@ -1,9 +1,85 @@
+ nelmio_api_doc:
++    models: { use_jms: false }
+     documentation:
+         info:
+-            title: Travel API
+-            description: This is an API to gather informations about cool places in the world
++            title: BileMoAPI
++            description: This is an awesome API REST for BileMo!
+             version: 1.0.0
++        components:
++            securitySchemes:
++                Bearer:
++                    type: http
++                    scheme: bearer
++                    bearerFormat: JWT
++                    in: header
++        security:
++            - Bearer: []
++
++        paths:
++            /api/login_check:
++                post:
++                    tags:
++                        - Login
++                    summary: Login into the api.
++                    requestBody:
++                        content:
++                            application/json:
++                                schema:
++                                    properties:
++                                        username:
++                                            type: string
++                                        password:
++                                            type: string
++                                    type: object
++                    responses:
++                        "200":
++                            description: OK
++                            content:
++                                application/json:
++                                    schema:
++                                        type: object
++                                        properties:
++                                            token:
++                                                type: string
++                                            refresh_token:
++                                                type: string
++                        "401":
++                            description: Invalid credentials
++                        "400":
++                            description: Invalid JSON.
++                    security: []
++
++            /api/token/refresh:
++                post:
++                    tags:
++                        - Login
++                    summary: Login into the api by refresh token.
++                    requestBody:
++                        content:
++                            application/json:
++                                schema:
++                                    properties:
++                                        refresh_token:
++                                            type: string
++                                    type: object
++                    responses:
++                        "200":
++                            description: OK
++                            content:
++                                application/json:
++                                    schema:
++                                        type: object
++                                        properties:
++                                            token:
++                                                type: string
++                                            refresh_token:
++                                                type: string
++                        "401":
++                            description: An authentication exception occurred.
++                    security: []
++
+     areas: # to filter documented areas
+         path_patterns:
+-            - ^/api(?!/doc$) # Accepts routes under /api except /api/doc
++            - ^/api(?!(/doc|/doc.json|/token/refresh)$)
++        #host_patterns:
++        #    - ^/api
+\ No newline at end of file

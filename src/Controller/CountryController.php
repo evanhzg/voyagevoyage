@@ -141,6 +141,7 @@ class CountryController extends AbstractController
         $country->setCapital($cityRepository->find($capitalId));
         $country->setEuropean($updateCountry->isEuropean() ?? $country->isEuropean());
         $country->setLanguages($updateCountry->getLanguages() ?? $country->getLanguages());
+
         $errors = $validator->validate($country);
         if($errors->count() > 0){
             return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);    
