@@ -28,7 +28,7 @@ class CountryController extends AbstractController
     }
 
     /**
-     * Path that returns all coutries
+     * Path that returns all countries
      * 
      * @param Request $request
      * @param CountryRepository $countryRepository

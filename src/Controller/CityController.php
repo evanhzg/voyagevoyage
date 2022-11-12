@@ -37,13 +37,13 @@ class CityController extends AbstractController
      * @return JsonResponse
      */
     #[Route('/api/cities', name: 'cities.getAll', methods: ['GET'])]
-    public function getAllCountries(Request $request, CityRepository $cityRepository, SerializerInterface $serializer): JsonResponse
+    public function getAllCities(Request $request, CityRepository $cityRepository, SerializerInterface $serializer): JsonResponse
     {
         $page = $request->get('page', 1);
         $limit = $request->get('limit', 10);
         $cities = $cityRepository->findWithPagination($page, $limit);
-        $jsonCountries = $serializer->serialize($cities, 'json', ["groups" => "getAllCountries"]);
-        return new JsonResponse($jsonCountries, Response::HTTP_OK, [], true);
+        $jsonCities = $serializer->serialize($cities, 'json', ["groups" => "getAllCities"]);
+        return new JsonResponse($jsonCities, Response::HTTP_OK, [], true);
     }
 
     /**
