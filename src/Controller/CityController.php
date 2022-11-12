@@ -45,7 +45,8 @@ class CityController extends AbstractController
     #[ParamConverter("city", options: ["id" =>"idCity"])]
     public function getCity(City $city, SerializerInterface $serializer): JsonResponse
     {
-        $jsonCity = $serializer->serialize($city, 'json', ["groups" => 'getCity']);
+        $context = SerializationContext::create()->setGroups("getCity");
+        $jsonCity = $serializer->serialize($city, 'json', $context);
         
         return new JsonResponse($jsonCity, Response::HTTP_OK, ['accept' => 'jsons'], true);
     }
@@ -66,7 +67,8 @@ class CityController extends AbstractController
         $cities = $cityRepository->findWithPagination($page, $limit);
         $jsonCities = $cache->get("getAllCities", function (ItemInterface $item) use ($cities, $serializer) {
             $item->tag("citiesCache");
-            return $serializer->serialize($cities, 'json', ["groups" => "getAllCities"]);
+            $context = SerializationContext::create()->setGroups("getAllCities");
+            return $serializer->serialize($cities, 'json', $context);
         });
         return new JsonResponse($jsonCities, Response::HTTP_OK, [], true);
     }
@@ -116,7 +118,8 @@ class CityController extends AbstractController
         }
         $entityManager->persist($city);
         $entityManager->flush();
-        $jsonCity = $serializer->serialize($city, 'json', ['groups' => "getCity"]);
+        $context = SerializationContext::create()->setGroups("getCity");
+        $jsonCity = $serializer->serialize($city, 'json',$context);
         $location = $urlGeneratorInterface->generate('city.get', ['idCity' => $city->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
         return new JsonResponse($jsonCity , Response::HTTP_CREATED, ["Location" => $location], true);
     }
@@ -136,7 +139,7 @@ class CityController extends AbstractController
      */
     #[Route('/api/cities/{idCity}', name: 'city.update', methods:['PATCH'])]
     #[ParamConverter('city', options: ['id' => 'idCity'])]
-    public function updateCityy(Request $request, City $city, CityRepository $cityRepository, EntityManagerInterface $entityManager, SerializerInterface $serializer, UrlGeneratorInterface $urlGeneratorInterface, ValidatorInterface $validator): JsonResponse
+    public function updateCityy(Request $request, City $city, EntityManagerInterface $entityManager, SerializerInterface $serializer, UrlGeneratorInterface $urlGeneratorInterface, ValidatorInterface $validator): JsonResponse
     {
         if(!$city->isStatus()){
             return new JsonResponse(null, Response::HTTP_NOT_FOUND, []);
@@ -148,12 +151,9 @@ class CityController extends AbstractController
             'json',
         );
         $updateCity->setStatus(true);
-        $content = $request->toArray();
         $city->setName($updateCity->getName() ?? $city->getName());
-        $city->setDescription($updateCity->getDescriptopn() ?? $city->getDescription());
+        $city->setDescription($updateCity->getDescription() ?? $city->getDescription());
         $city->setPopulation($updateCity->getPopulation() ?? $city->getPopulation());
-        $city->setEuropean($updateCity->isEuropean() ?? $city->isEuropean());
-        $city->setLanguages($updateCity->getLanguages() ?? $city->getLanguages());
         $errors = $validator->validate($city);
         if($errors->count() > 0){
             return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);    

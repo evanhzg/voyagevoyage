@@ -73,7 +73,8 @@ class CountryController extends AbstractController
         if(!$country->isStatus()){
             return new JsonResponse(null, Response::HTTP_NOT_FOUND, []);
         }
-        $jsonCountry = $serializer->serialize($country, 'json', ["groups" => "getCountry"]);
+        $context = SerializationContext::create()->setGroups("getAllCountries");
+        $jsonCountry = $serializer->serialize($country, 'json', $context);
         return new JsonResponse($jsonCountry, Response::HTTP_OK, ['accept' => 'jsons'], true);
     }
     
@@ -103,7 +104,8 @@ class CountryController extends AbstractController
         }
         $entityManager->persist($country);
         $entityManager->flush();
-        $jsonCountry = $serializer->serialize($country, 'json', ['groups' => "getCountry"]);
+        $context = SerializationContext::create()->setGroups("getAllCountries");
+        $jsonCountry = $serializer->serialize($country, 'json', $context);
         $location = $urlGeneratorInterface->generate('countries.get', ['idCountry' => $country->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
         return new JsonResponse($jsonCountry . ', {"message":"For the creation to be complete please create a city and inform it is the capital of its country."}', Response::HTTP_CREATED, ["Location" => $location], true);
     }
