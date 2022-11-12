@@ -39,12 +39,7 @@ class City
     #[Groups(['getAllCities', 'getCity', 'getCountry'])]
     private ?string $description = null;
 
-    #[ORM\Column]
-    #[Groups(['getAllCountries', 'getCountry'])]
-    #[NotNull(message: 'You must say if the country is part of EU.')]
-    #[Type('boolean')]
-    #[Property(type: 'boolean')]
-    private ?bool $european = null;
+   
 
     #[ORM\Column]
     private ?bool $status = null;

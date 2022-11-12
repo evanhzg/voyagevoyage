@@ -30,6 +30,15 @@ class CityRepository extends ServiceEntityRepository
         }
     }
 
+    public function findWithPagination(int $page, int $limit){
+        return $this->createQueryBuilder('c')
+            ->setMaxResults($limit)
+            ->setFirstResult(($page - 1) * $limit)
+            ->where('c.status = true')
+            ->getQuery()
+            ->getResult();
+    }
+    
     public function remove(City $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
