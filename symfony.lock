@@ -152,5 +152,17 @@
         "files": [
             "config/packages/validator.yaml"
         ]
+    },
+    "willdurand/hateoas-bundle": {
+        "version": "2.5",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "main",
+            "version": "2.0",
+            "ref": "34df072c6edaa61ae19afb2f3a239f272fecab87"
+        },
+        "files": [
+            "./config/packages/bazinga_hateoas.yaml"
+        ]
     }
 }

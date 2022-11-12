@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3209dda98e17cf304ef9729d08d543d7",
+    "content-hash": "86e4d154df7482311ca4bbfba084700d",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -5601,6 +5601,66 @@
                 "source": "https://github.com/willdurand/Hateoas/tree/3.8.0"
             },
             "time": "2021-12-18T21:29:42+00:00"
+        },
+        {
+            "name": "willdurand/hateoas-bundle",
+            "version": "2.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/willdurand/BazingaHateoasBundle.git",
+                "reference": "f9f09f02c464469ff4deb5dfe6619c4c1409ef44"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/willdurand/BazingaHateoasBundle/zipball/f9f09f02c464469ff4deb5dfe6619c4c1409ef44",
+                "reference": "f9f09f02c464469ff4deb5dfe6619c4c1409ef44",
+                "shasum": ""
+            },
+            "require": {
+                "jms/serializer-bundle": "^3.1 || ^4.0 || ^5.0@beta",
+                "php": "^7.2 || ^8.0",
+                "symfony/expression-language": "~3.0 || ~4.0 || ~5.0 || ~6.0",
+                "symfony/framework-bundle": "~3.0 || ~4.0 || ~5.0 || ~6.0",
+                "willdurand/hateoas": "^3.5"
+            },
+            "require-dev": {
+                "doctrine/annotations": "^1.13.2",
+                "doctrine/coding-standard": "^8.0",
+                "phpunit/phpunit": "^8.5 || ^9.5",
+                "symfony/stopwatch": "~3.0 || ~4.0 || ~5.0 || ~6.0",
+                "twig/twig": "~1.12|~2.0"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Bazinga\\Bundle\\HateoasBundle\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "William Durand",
+                    "email": "william.durand1@gmail.com"
+                }
+            ],
+            "description": "Integration of Hateoas into Symfony2.",
+            "keywords": [
+                "HATEOAS",
+                "rest"
+            ],
+            "support": {
+                "issues": "https://github.com/willdurand/BazingaHateoasBundle/issues",
+                "source": "https://github.com/willdurand/BazingaHateoasBundle/tree/2.5.0"
+            },
+            "time": "2022-09-14T09:43:38+00:00"
         }
     ],
     "packages-dev": [
