@@ -2,15 +2,15 @@
 
 namespace App\Entity;
 
+use OpenApi\Attributes;
 use Doctrine\ORM\Mapping as ORM;
+use OpenApi\Attributes\Property;
 use App\Repository\CountryRepository;
+use JMS\Serializer\Annotation\Groups;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Validator\Constraints as Assert;
-use JMS\Serializer\Annotation\Groups;
 use Hateoas\Configuration\Annotation as Hateoas;
-use OpenApi\Attributes;
-use OA\Property;
+use Symfony\Component\Validator\Constraints as Assert;
 
 
 /**
@@ -30,11 +30,11 @@ class Country
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['getAllCountries', 'getCountry'])]
+    #[Groups(['getAllCountries', 'getCountry', 'getCity', 'getCities'])]
     private ?int $id = null;
     
     #[ORM\Column(length: 255)]
-    #[Groups(['getAllCountries', 'getCountry'])]
+    #[Groups(['getAllCountries', 'getCountry', 'getCity', 'getCities'])]
     #[Assert\Sequentially([
         new Assert\NotBlank(message: 'You must give the country a name.'),
         new Assert\Type('string'),
@@ -43,7 +43,7 @@ class Country
     private ?string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['getAllCountries', 'getCountry'])]
+    #[Groups(['getAllCountries', 'getCountry','getCity', 'getCities'])]
     #[Assert\Sequentially([
         new Assert\Type('string'),
         new Assert\Length(min: 1, max: 255)
@@ -51,7 +51,7 @@ class Country
     private ?string $languages = null;
 
     #[ORM\Column]
-    #[Groups(['getAllCountries', 'getCountry'])]
+    #[Groups(['getAllCountries', 'getCountry', 'getCity', 'getCities'])]
     #[Assert\NotNull(message: 'You must say if the country is part of EU.')]
     #[Assert\Type('boolean')]
     #[Property(type: 'boolean')]
