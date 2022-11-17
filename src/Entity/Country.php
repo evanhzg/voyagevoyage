@@ -2,13 +2,15 @@
 
 namespace App\Entity;
 
+use OA\Property;
+use OpenApi\Attributes;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\CountryRepository;
+use JMS\Serializer\Annotation\Groups;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Validator\Constraints as Assert;
 use Hateoas\Configuration\Annotation as Hateoas;
-use JMS\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @Hateoas\Relation(
@@ -76,11 +78,12 @@ class Country
         new Assert\Length(min: 1, max: 255)
     ])]
     private ?string $languages = null;
-
+    
     #[ORM\Column]
     #[Groups(['getAllCountries', 'getCountry'])]
     #[Assert\NotNull(message: 'You must say if the country is part of EU.')]
     #[Assert\Type('boolean')]
+    #[Property(type: 'boolean')]
     private ?bool $european = null;
 
     #[ORM\Column]
