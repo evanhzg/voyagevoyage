@@ -92,6 +92,7 @@ class City
     private ?bool $status = null;
 
     #[ORM\OneToMany(mappedBy: 'city', targetEntity: Place::class)]
+    #[Groups(['getCity'])]
     private Collection $places;
 
     #[ORM\Column(length: 6, nullable: true)]

@@ -87,6 +87,7 @@ class Country
     private ?bool $status = null;
 
     #[ORM\OneToMany(mappedBy: 'country', targetEntity: City::class)]
+    #[Groups(['getCountry'])]
     private Collection $cities;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]

@@ -5,17 +5,15 @@ namespace App\Controller;
 use App\Entity\Country;
 use App\Repository\CityRepository;
 use App\Repository\CountryRepository;
+use JMS\Serializer\SerializerInterface;
+use JMS\Serializer\SerializationContext;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use JMS\Serializer\SerializerInterface;
-use JMS\Serializer\Serializer;
-use JMS\Serializer\SerializationContext;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
@@ -42,7 +40,25 @@ class CountryController extends AbstractController
     {
         $page = $request->get('page', 1);
         $limit = $request->get('limit', 10);
-        $countries = $countryRepository->findWithPagination($page, $limit);
+        $orderBy = "id";
+        $orderByDirection = "asc";
+        $filters = [];
+        if($request->get('alphabetical') !== null){
+            $orderBy = "name";
+        } else if('reverseAlphabetical' !== null){
+            $orderBy = "name";
+            $orderByDirection = "desc";
+        }
+        if($request->get('european') === "true" || $request->get('european') === "false") {
+            $filters["european"] = " = " . $request->get('european');
+        }
+        if($request->get('name') !== null) {
+            $filters["name"] = " LIKE '%" . $request->get('name') . "%'";
+        }
+        if($request->get('language') !== null) {
+            $filters["languages"] = " LIKE '%" . $request->get('language') . "%'";
+        }
+        $countries = $countryRepository->findWithPagination($page, $limit, $orderBy, $orderByDirection, $filters);
         $context = SerializationContext::create()->setGroups(["getAllCountries"]);
         $jsonCountries = $serializer->serialize($countries, 'json', $context);
         return new JsonResponse($jsonCountries, Response::HTTP_OK, [], true);

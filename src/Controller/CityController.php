@@ -5,18 +5,15 @@ namespace App\Controller;
 use App\Entity\City;
 use App\Repository\CityRepository;
 use App\Repository\CountryRepository;
-use Doctrine\ORM\EntityManager;
+use JMS\Serializer\SerializerInterface;
+use JMS\Serializer\SerializationContext;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use JMS\Serializer\SerializerInterface;
-use JMS\Serializer\Serializer;
-use JMS\Serializer\SerializationContext;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
@@ -43,7 +40,31 @@ class CityController extends AbstractController
     {
         $page = $request->get('page', 1);
         $limit = $request->get('limit', 10);
-        $cities = $cityRepository->findWithPagination($page, $limit);
+        $orderBy = "id";
+        $orderByDirection = "asc";
+        $filters = [];
+        if($request->get('alphabetical') !== null){
+            $orderBy = "name";
+        } else if('reverseAlphabetical' !== null){
+            $orderBy = "name";
+            $orderByDirection = "desc";
+        }
+        if($request->get('populationSortDesc') !== null) {
+            $orderBy = "population";
+            $orderByDirection = "desc";
+        } else if($request->get('populationSortAsc')){
+            $orderBy = "population";
+        }
+        if($request->get('name') !== null) {
+            $filters["name"] = " LIKE '%" . $request->get('name') . "%'";
+        }
+        if($request->get('populationGreaterThan') != null && is_numeric($request->get('populationGreaterThan'))) {
+            $filters["population"] = " > " . $request->get('populationGreaterThan');
+        }
+        if($request->get('populationLessThan') != null && is_numeric($request->get('populationLessThan'))) {
+            $filters["population"] = " < " . $request->get('populationLessThan');
+        }
+        $cities = $cityRepository->findWithPagination($page, $limit, $orderBy, $orderByDirection, $filters);
         $context = SerializationContext::create()->setGroups(["getAllCities"]);
         $jsonCities = $serializer->serialize($cities, 'json', $context);
         return new JsonResponse($jsonCities, Response::HTTP_OK, [], true);
