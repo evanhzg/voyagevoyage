@@ -3,12 +3,12 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\Groups;
 use App\Repository\CountryRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Validator\Constraints as Assert;
 use Hateoas\Configuration\Annotation as Hateoas;
-use JMS\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @Hateoas\Relation(
@@ -57,11 +57,11 @@ class Country
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['getAllCountries', 'getCountry', 'getCity', 'getAllCities'])]
+    #[Groups(['getAllCountries', 'getCountry', 'getCity', 'getAllCities', 'getPlace'])]
     private ?int $id = null;
     
     #[ORM\Column(length: 255)]
-    #[Groups(['getAllCountries', 'getCountry', 'getCity'])]
+    #[Groups(['getAllCountries', 'getCountry', 'getCity', 'getAllCities', 'getPlace'])]
     #[Assert\Sequentially([
         new Assert\NotBlank(message: 'You must give the country a name.'),
         new Assert\Type('string'),

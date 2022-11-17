@@ -2,14 +2,14 @@
 
 namespace App\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\CityRepository;
+use JMS\Serializer\Annotation\Groups;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Validator\Constraints as Assert;
 use Hateoas\Configuration\Annotation as Hateoas;
-use JMS\Serializer\Annotation\Groups;
-use Doctrine\DBAL\Types\Types;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @Hateoas\Relation(
@@ -76,16 +76,12 @@ class City
 
     #[ORM\Column]
     #[Groups(['getAllCities', 'getCity', 'getCountry', 'getPlace'])]
-    #[Assert\Sequentially([
-        new Assert\Type('integer')
-    ])]
+    #[Assert\Type('integer')]
     private ?int $population = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups(['getAllCities', 'getCity', 'getCountry', 'getPlace'])]
-    #[Assert\Sequentially([
-        new Assert\Type('string')
-    ])]
+    #[Assert\Type('string')]
     private ?string $description = null;
 
     #[ORM\Column]
@@ -96,6 +92,10 @@ class City
     private Collection $places;
 
     #[ORM\Column(length: 6, nullable: true)]
+    #[Assert\Sequentially([
+        new Assert\Type('string'),
+        new Assert\Length(max: 6)
+    ])]
     private ?string $time_zone = null;
 
     public function __construct()

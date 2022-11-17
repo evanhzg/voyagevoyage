@@ -46,7 +46,7 @@ class PlaceRepository extends ServiceEntityRepository
             ->orderBy("p." . $orderBy, $orderByDirection)
             ->where('p.status = true');
         foreach ($filters as $filterKey => $filterValue) {
-            $query->where('p.' . $filterKey . $filterValue );
+            $query->andWhere('p.' . $filterKey . $filterValue );
         }
         return $query->getQuery()
             ->getResult();

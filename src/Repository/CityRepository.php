@@ -41,12 +41,12 @@ class CityRepository extends ServiceEntityRepository
 
     public function findWithPagination(int $page, int $limit, string $orderBy, string $orderByDirection, array $filters){
         $query = $this->createQueryBuilder('c')
+            ->orderBy("c." . $orderBy, $orderByDirection)
             ->setMaxResults($limit)
             ->setFirstResult(($page - 1) * $limit)
-            ->orderBy("c." . $orderBy, $orderByDirection)
             ->where('c.status = true');
         foreach ($filters as $filterKey => $filterValue) {
-            $query->where('c.' . $filterKey . $filterValue );
+            $query->andWhere('c.' . $filterKey . $filterValue );
         }
         return $query->getQuery()
             ->getResult();

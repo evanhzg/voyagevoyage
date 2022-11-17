@@ -54,8 +54,8 @@ class AppFixtures extends Fixture
                     ->setType(ucfirst($this->faker->word()))
                     ->setAddress($this->faker->address())
                     ->setPricing($this->faker->numberBetween(1, 3))
-                    ->setOpenHour($this->faker->dateTimeBetween("06:00", "9:30"))
-                    ->setClosedHour($this->faker->dateTimeBetween("10:00", "23:30"))
+                    ->setOpenHour('08:00')
+                    ->setClosedHour('18:00')
                     ->setOpenDays("Monday, Tuesday, Wednesday, Thursday, Friday")
                     ->setCity($city)
                     ->setStatus(1);

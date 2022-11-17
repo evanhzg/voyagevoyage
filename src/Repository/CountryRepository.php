@@ -47,7 +47,7 @@ class CountryRepository extends ServiceEntityRepository
             ->orderBy("c." . $orderBy, $orderByDirection)
             ->where('c.status = true');
         foreach ($filters as $filterKey => $filterValue) {
-            $query->where('c.' . $filterKey . $filterValue );
+            $query->andWhere('c.' . $filterKey . $filterValue );
         }
         return $query->getQuery()
             ->getResult();

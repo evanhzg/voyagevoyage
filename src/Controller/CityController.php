@@ -17,10 +17,11 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
+
 class CityController extends AbstractController
 {
     #[Route('/city', name: 'app_city')]
-    public function index(Request $request): JsonResponse
+    public function index(Request $request, SerializerInterface $hateoas): JsonResponse
     {
         return $this->json([
             'message' => "Wrong route, try 'http://" . explode('/', $request->getUri())[2] . "/api/cities'",
@@ -38,14 +39,14 @@ class CityController extends AbstractController
     #[Route('/api/cities', name: 'cities.getAll', methods: ['GET'])]
     public function getAllCities(Request $request, CityRepository $cityRepository, SerializerInterface $serializer): JsonResponse
     {
-        $page = $request->get('page', 1);
-        $limit = $request->get('limit', 10);
+        $page = $request->get('page') > 0 ? $request->get('page') : 1;
+        $limit = $request->get('limit') > 0 ? $request->get('limit') : 10;
         $orderBy = "id";
         $orderByDirection = "asc";
         $filters = [];
         if($request->get('alphabetical') !== null){
             $orderBy = "name";
-        } else if('reverseAlphabetical' !== null){
+        } else if($request->get('reverseAlphabetical') !== null){
             $orderBy = "name";
             $orderByDirection = "desc";
         }
@@ -58,8 +59,8 @@ class CityController extends AbstractController
         if($request->get('name') !== null) {
             $filters["name"] = " LIKE '%" . $request->get('name') . "%'";
         }
-        if($request->get('countryId')){
-            $filters["country_id"] = " = " . $request->get('countryId');
+        if($request->get('countryId') !== null){
+            $filters["country"] = " = " . $request->get('countryId');            
         }
         if($request->get('populationGreaterThan') != null && is_numeric($request->get('populationGreaterThan'))) {
             $filters["population"] = " > " . $request->get('populationGreaterThan');
@@ -68,7 +69,7 @@ class CityController extends AbstractController
             $filters["population"] = " < " . $request->get('populationLessThan');
         }
         $cities = $cityRepository->findWithPagination($page, $limit, $orderBy, $orderByDirection, $filters);
-        $context = SerializationContext::create()->setGroups(["getAllCities"]);
+        $context = SerializationContext::create()->setGroups(["getAllCities"])->setSerializeNull(true);
         $jsonCities = $serializer->serialize($cities, 'json', $context);
         return new JsonResponse($jsonCities, Response::HTTP_OK, [], true);
     }
@@ -87,7 +88,7 @@ class CityController extends AbstractController
         if(!$city->isStatus()){
             return new JsonResponse(null, Response::HTTP_NOT_FOUND, []);
         }
-        $context = SerializationContext::create()->setGroups(["getCity"]);
+        $context = SerializationContext::create()->setGroups(["getCity"])->setSerializeNull(true);
         $jsonCity = $serializer->serialize($city, 'json', $context);
         return new JsonResponse($jsonCity, Response::HTTP_OK, ['accept' => 'jsons'], true);
     }
@@ -126,7 +127,7 @@ class CityController extends AbstractController
         }
         $entityManager->persist($city);
         $entityManager->flush();
-        $context = SerializationContext::create()->setGroups(["getCity"]);
+        $context = SerializationContext::create()->setGroups(["getCity"])->setSerializeNull(true);
         $jsonCity = $serializer->serialize($city, 'json', $context);
         $location = $urlGeneratorInterface->generate('cities.get', ['idCity' => $city->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
         return new JsonResponse($jsonCity, Response::HTTP_CREATED, ["Location" => $location], true);
@@ -175,7 +176,7 @@ class CityController extends AbstractController
         }
         $entityManager->persist($city);
         $entityManager->flush();
-        $context = SerializationContext::create()->setGroups(["getCity"]);
+        $context = SerializationContext::create()->setGroups(["getCity"])->setSerializeNull(true);
         $jsonCity = $serializer->serialize($city, 'json', $context);
         $location = $urlGeneratorInterface->generate('cities.get', ['idCity' => $city->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
         return new JsonResponse($jsonCity, Response::HTTP_CREATED, ["Location" => $location], true);

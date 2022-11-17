@@ -38,14 +38,14 @@ class PlaceController extends AbstractController
     #[Route('/api/places', name: 'places.getAll', methods: ['GET'])]
     public function getAllPlaces(Request $request, PlaceRepository $placeRepository, SerializerInterface $serializer): JsonResponse
     {
-        $page = $request->get('page', 1);
-        $limit = $request->get('limit', 10);
+        $page = $request->get('page') > 0 ? $request->get('page') : 1;
+        $limit = $request->get('limit') > 0 ? $request->get('limit') : 10;
         $orderBy = "id";
         $orderByDirection = "asc";
         $filters = [];
         if($request->get('alphabetical') !== null){
             $orderBy = "name";
-        } else if('reverseAlphabetical' !== null){
+        } else if($request->get('reverseAlphabetical') !== null){
             $orderBy = "name";
             $orderByDirection = "desc";
         }
@@ -59,10 +59,10 @@ class PlaceController extends AbstractController
             $filters["open_days"] = " LIKE '%" . $request->get('openDay') . "%'";
         }
         if($request->get('cityId')){
-            $filters["city_id"] = " = " . $request->get('cityId');
+            $filters["city"] = " = " . $request->get('cityId');
         }
         $places = $placeRepository->findWithPagination($page, $limit, $orderBy, $orderByDirection, $filters);
-        $context = SerializationContext::create()->setGroups(["getAllPlaces"]);
+        $context = SerializationContext::create()->setGroups(["getAllPlaces"])->setSerializeNull(true);
         $jsonPlaces = $serializer->serialize($places, 'json', $context);
         return new JsonResponse($jsonPlaces, Response::HTTP_OK, [], true);
     }
@@ -81,7 +81,7 @@ class PlaceController extends AbstractController
         if(!$place->isStatus()){
             return new JsonResponse(null, Response::HTTP_NOT_FOUND, []);
         }
-        $context = SerializationContext::create()->setGroups(["getPlace"]);
+        $context = SerializationContext::create()->setGroups(["getPlace"])->setSerializeNull(true);
         $jsonPlace = $serializer->serialize($place, 'json', $context);
         return new JsonResponse($jsonPlace, Response::HTTP_OK, ['accept' => 'jsons'], true);
     }
@@ -120,7 +120,7 @@ class PlaceController extends AbstractController
         }
         $entityManager->persist($place);
         $entityManager->flush();
-        $context = SerializationContext::create()->setGroups(["getPlace"]);
+        $context = SerializationContext::create()->setGroups(["getPlace"])->setSerializeNull(true);
         $jsonPlace = $serializer->serialize($place, 'json', $context);
         $location = $urlGeneratorInterface->generate('places.get', ['idPlace' => $place->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
         return new JsonResponse($jsonPlace, Response::HTTP_CREATED, ["Location" => $location], true);
@@ -155,12 +155,12 @@ class PlaceController extends AbstractController
         $place->setStatus(true);
         $content = $request->toArray();
         $place->setName($updatePlace->getName() ?? $place->getName());
-        $place->setType($updatePlace->setType() ?? $place->getType());
-        $place->setAddress($updatePlace->setAddress() ?? $place->getAddress());
+        $place->setType($updatePlace->getType() ?? $place->getType());
+        $place->setAddress($updatePlace->getAddress() ?? $place->getAddress());
         $cityId = $content['cityId'] ?? $place->getCity()->getId();
         $place->setCity($cityRepository->find($cityId));
         $place->setOpenHour($updatePlace->getOpenHour() ?? $place->getOpenHour());
-        $place->setClosedHour($updatePlace->getClosetClosedHour() ?? $place->getClosedHour());
+        $place->setClosedHour($updatePlace->getClosedHour() ?? $place->getClosedHour());
         $place->setOpenDays($updatePlace->getOpenDays() ?? $place->getOpenDays());
         $place->setPricing($updatePlace->getPricing() ?? $place->getPricing());
         $errors = $validator->validate($place);
@@ -173,7 +173,7 @@ class PlaceController extends AbstractController
         }
         $entityManager->persist($place);
         $entityManager->flush();
-        $context = SerializationContext::create()->setGroups(["getPlace"]);
+        $context = SerializationContext::create()->setGroups(["getPlace"])->setSerializeNull(true);
         $jsonPlace = $serializer->serialize($place, 'json', $context);
         $location = $urlGeneratorInterface->generate('places.get', ['idPlace' => $place->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
         return new JsonResponse($jsonPlace, Response::HTTP_CREATED, ["Location" => $location], true);
