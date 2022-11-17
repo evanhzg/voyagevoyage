@@ -58,6 +58,9 @@ class CityController extends AbstractController
         if($request->get('name') !== null) {
             $filters["name"] = " LIKE '%" . $request->get('name') . "%'";
         }
+        if($request->get('countryId')){
+            $filters["country_id"] = " = " . $request->get('countryId');
+        }
         if($request->get('populationGreaterThan') != null && is_numeric($request->get('populationGreaterThan'))) {
             $filters["population"] = " > " . $request->get('populationGreaterThan');
         }

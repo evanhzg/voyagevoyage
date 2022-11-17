@@ -14,30 +14,35 @@ class Place
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['getAllPlaces', 'getPlace'])]
+    #[Groups(['getAllPlaces', 'getPlace', 'getCity'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['getAllPlaces', 'getPlace'])]
+    #[Groups(['getAllPlaces', 'getPlace', 'getCity'])]
     private ?string $name = null;
 
-    #[Groups(['getAllPlaces', 'getPlace'])]
+    #[Groups(['getAllPlaces', 'getPlace', 'getCity'])]
     #[ORM\Column(length: 255)]
     private ?string $type = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['getAllPlaces', 'getPlace', 'getCity'])]
     private ?string $address = null;
 
     #[ORM\Column(type: Types::TIME_MUTABLE, nullable: true)]
+    #[Groups(['getAllPlaces', 'getPlace', 'getCity'])]
     private ?\DateTimeInterface $open_hour = null;
 
     #[ORM\Column(type: Types::TIME_MUTABLE, nullable: true)]
+    #[Groups(['getAllPlaces', 'getPlace', 'getCity'])]
     private ?\DateTimeInterface $closed_hour = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['getAllPlaces', 'getPlace', 'getCity'])]
     private ?string $open_days = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['getAllPlaces', 'getPlace', 'getCity'])]
     private ?int $pricing = null;
 
     #[ORM\ManyToOne(inversedBy: 'places')]

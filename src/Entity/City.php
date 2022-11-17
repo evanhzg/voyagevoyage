@@ -57,11 +57,11 @@ class City
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['getAllCities', 'getCity', 'getCountry', 'getAllCountries'])]
+    #[Groups(['getAllCities', 'getCity', 'getCountry', 'getAllCountries', 'getAllPlaces', 'getPlace'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['getAllCities', 'getCity', 'getCountry', 'getAllCountries'])]
+    #[Groups(['getAllCities', 'getCity', 'getCountry', 'getAllCountries', 'getAllPlaces', 'getPlace'])]
     #[Assert\Sequentially([
         new Assert\NotBlank(message: 'You must give the city a name.'),
         new Assert\Type('string'),
@@ -71,18 +71,18 @@ class City
 
     #[ORM\ManyToOne(inversedBy: 'cities')]
     #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
-    #[Groups(['getAllCities', 'getCity'])]
+    #[Groups(['getAllCities', 'getCity', 'getPlace'])]
     private ?Country $country = null;
 
     #[ORM\Column]
-    #[Groups(['getAllCities', 'getCity', 'getCountry'])]
+    #[Groups(['getAllCities', 'getCity', 'getCountry', 'getPlace'])]
     #[Assert\Sequentially([
         new Assert\Type('integer')
     ])]
     private ?int $population = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['getAllCities', 'getCity', 'getCountry'])]
+    #[Groups(['getAllCities', 'getCity', 'getCountry', 'getPlace'])]
     #[Assert\Sequentially([
         new Assert\Type('string')
     ])]

@@ -9,6 +9,7 @@ use Faker\Factory;
 use App\Entity\City;
 use App\Entity\Place;
 use App\Entity\Country;
+use DateInterval;
 
 class AppFixtures extends Fixture
 {
@@ -52,9 +53,10 @@ class AppFixtures extends Fixture
                     $place->setName(ucfirst($this->faker->word()))
                     ->setType(ucfirst($this->faker->word()))
                     ->setAddress($this->faker->address())
-                    ->setPricing(4)
-                    ->setOpenHour($this->faker->dateTime())
-                    ->setClosedHour($this->faker->dateTime())
+                    ->setPricing($this->faker->numberBetween(1, 3))
+                    ->setOpenHour($this->faker->dateTimeBetween("06:00", "9:30"))
+                    ->setClosedHour($this->faker->dateTimeBetween("10:00", "23:30"))
+                    ->setOpenDays("Monday, Tuesday, Wednesday, Thursday, Friday")
                     ->setCity($city)
                     ->setStatus(1);
                     $manager->persist($place);
