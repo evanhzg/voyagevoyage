@@ -9,6 +9,8 @@ use Faker\Factory;
 use App\Entity\City;
 use App\Entity\Place;
 use App\Entity\Country;
+use App\Entity\User;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use DateInterval;
 
 class AppFixtures extends Fixture
@@ -20,14 +22,27 @@ class AppFixtures extends Fixture
      */
     private Generator $faker;
 
+    /**
+     * Class that hashs the password
+     *
+     * @var UserPasswordHasherInterface
+     */
+    private UserPasswordHasherInterface $passHasher;
 
-    public function __construct()
+    public function __construct(UserPasswordHasherInterface $passHasher)
     {
         $this->faker = Factory::create('en_GB');
+        $this->passHasher = $passHasher;
     }
 
     public function load(ObjectManager $manager): void
     {
+        $admin = new User();
+        $admin->setUsername('admin')
+            ->setRoles(["ROLE_ADMIN"])
+            ->setPassword($this->passHasher->hashPassword($admin, "admin"));
+        $manager->persist($admin);
+
         for ($i=0; $i<8; $i++)
         {
             $country = new Country();
