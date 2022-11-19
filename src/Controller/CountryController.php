@@ -82,6 +82,28 @@ class CountryController extends AbstractController
         $jsonCountry = $serializer->serialize($country, 'json', $context);
         return new JsonResponse($jsonCountry, Response::HTTP_OK, ['accept' => 'jsons'], true);
     }
+
+//    /**
+//     * Path that returns a trip based on a country id
+//     *
+//     * @param Country $country
+//     * @param SerializerInterface $serializer
+//     * @return JsonResponse
+//     */
+//    #[Route('/api/countries/{idCountry}/trip', name: 'trip.get', methods:['GET'])]
+//    #[ParamConverter('country', options: ['id' => 'idCountry'])]
+//    public function getTrip(Country $country, CountryRepository $countryRepository, SerializerInterface $serializer): JsonResponse
+//    {
+//        if(!$country->isStatus()){
+//            return new JsonResponse(null, Response::HTTP_NOT_FOUND, []);
+//        }
+//
+//        $trip = $countryRepository->randTrip();
+//
+//        $context = SerializationContext::create()->setGroups(["getCountry"])->setSerializeNull(true);
+//        $jsonCountry = $serializer->serialize($trip, 'json', $context);
+//        return new JsonResponse($jsonCountry, Response::HTTP_OK, ['accept' => 'jsons'], true);
+//    }
     
     /**
      * Path that creates a country then returns it

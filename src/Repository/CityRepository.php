@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\City;
+use App\Entity\Country;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -51,21 +52,19 @@ class CityRepository extends ServiceEntityRepository
         return $query->getQuery()
             ->getResult();
     }
-    
+
 //    /**
+//     * @param Country $country
 //     * @return City[] Returns an array of City objects
 //     */
-//    public function findByExampleField($value): array
+//    public function findByRandomCity(Country $country): array
 //    {
 //        return $this->createQueryBuilder('c')
-//            ->andWhere('c.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('c.id', 'ASC')
-//            ->setMaxResults(10)
+//            ->andWhere('c.country =' . $country)
 //            ->getQuery()
 //            ->getResult()
 //        ;
-//    }
+    }
 
 //    public function findOneBySomeField($value): ?City
 //    {
