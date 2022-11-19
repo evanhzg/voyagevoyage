@@ -9,6 +9,9 @@ use Faker\Factory;
 use App\Entity\City;
 use App\Entity\Place;
 use App\Entity\Country;
+use App\Entity\User;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use DateInterval;
 
 class AppFixtures extends Fixture
 {
@@ -19,23 +22,35 @@ class AppFixtures extends Fixture
      */
     private Generator $faker;
 
+    /**
+     * Class that hashs the password
+     *
+     * @var UserPasswordHasherInterface
+     */
+    private UserPasswordHasherInterface $passHasher;
 
-    public function __construct()
+    public function __construct(UserPasswordHasherInterface $passHasher)
     {
         $this->faker = Factory::create('en_GB');
+        $this->passHasher = $passHasher;
     }
 
     public function load(ObjectManager $manager): void
     {
+        $admin = new User();
+        $admin->setUsername('admin')
+            ->setRoles(["ROLE_ADMIN"])
+            ->setPassword($this->passHasher->hashPassword($admin, "admin"));
+        $manager->persist($admin);
+
         for ($i=0; $i<8; $i++)
         {
             $country = new Country();
             $country->setName(ucfirst($this->faker->word()))
-            ->setLanguage('fr_FR')
+            ->setLanguages('fr_FR')
             ->setEuropean(random_int(0,1))
-            ->setTimeZone('UTC+' . random_int(0, 14))
             ->setStatus(true);
-
+            $countryTimeZone = random_int(0, 14);
             for ($j=0; $j<10; $j++)
             {
                 $city = new City();
@@ -43,6 +58,7 @@ class AppFixtures extends Fixture
                 ->setPopulation(random_int(13000, 850000))
                 ->setDescription($this->faker->sentence(15))
                 ->setCountry($country)
+                ->setTimeZone('UTC+' . $countryTimeZone)
                 ->setStatus(1);
                 $manager->persist($city);
             
@@ -52,9 +68,10 @@ class AppFixtures extends Fixture
                     $place->setName(ucfirst($this->faker->word()))
                     ->setType(ucfirst($this->faker->word()))
                     ->setAddress($this->faker->address())
-                    ->setPricing(4)
-                    ->setOpenHour($this->faker->dateTime())
-                    ->setClosedHour($this->faker->dateTime())
+                    ->setPricing($this->faker->numberBetween(1, 3))
+                    ->setOpenHour('08:00')
+                    ->setClosedHour('18:00')
+                    ->setOpenDays("Monday, Tuesday, Wednesday, Thursday, Friday")
                     ->setCity($city)
                     ->setStatus(1);
                     $manager->persist($place);

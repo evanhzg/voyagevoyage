@@ -39,6 +39,19 @@ class PlaceRepository extends ServiceEntityRepository
         }
     }
 
+    public function findWithPagination(int $page, int $limit, string $orderBy, string $orderByDirection, array $filters){
+        $query = $this->createQueryBuilder('p')
+            ->setMaxResults($limit)
+            ->setFirstResult(($page - 1) * $limit)
+            ->orderBy("p." . $orderBy, $orderByDirection)
+            ->where('p.status = true');
+        foreach ($filters as $filterKey => $filterValue) {
+            $query->andWhere('p.' . $filterKey . $filterValue );
+        }
+        return $query->getQuery()
+            ->getResult();
+    }
+
 //    /**
 //     * @return Place[] Returns an array of Place objects
 //     */

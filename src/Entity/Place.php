@@ -2,42 +2,117 @@
 
 namespace App\Entity;
 
-use App\Repository\PlaceRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
-use Doctrine\DBAL\Types\Types;
-# use Symfony\Component\Validator\Constraints as Asserts;
+use App\Repository\PlaceRepository;
+use JMS\Serializer\Annotation\Groups;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * @Hateoas\Relation(
+ *      "self",
+ *      href=@Hateoas\Route(
+ *          "countries.get",
+ *          parameters = {"idCountry" = "expr(object.getId())"}
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(groups={"getAllPlaces", "getPlace"})
+ * )
+ * @Hateoas\Relation(
+ *      "collection",
+ *      href= @Hateoas\Route(
+ *          "countries.getAll",
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(groups={"getAllPlaces", "getPlace"})
+ * )
+ * @Hateoas\Relation(
+ *      "create",
+ *      href= @Hateoas\Route(
+ *          "countries.create"
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(groups={"getAllPlaces", "getPlace"})
+ * )
+ * @Hateoas\Relation(
+ *      "update",
+ *      href= @Hateoas\Route(
+ *          "countries.update",
+ *          parameters = {"idCountry" = "expr(object.getId())"}
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(groups={"getAllPlaces", "getPlace"})
+ * )
+ * @Hateoas\Relation(
+ *      "remove",
+ *      href= @Hateoas\Route(
+ *          "countries.delete",
+ *          parameters = {"idCountry" = "expr(object.getId())"}
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(groups={"getAllPlaces", "getPlace"})
+ * )
+ */
 #[ORM\Entity(repositoryClass: PlaceRepository::class)]
 class Place
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['getAllPlaces', 'getPlace'])]
+    #[Groups(['getAllPlaces', 'getPlace', 'getCity'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['getAllPlaces', 'getPlace'])]
+    #[Groups(['getAllPlaces', 'getPlace', 'getCity'])]
+    #[Assert\Sequentially([
+        new Assert\NotBlank(message: 'You must give the place a name.'),
+        new Assert\Type('string'),
+        new Assert\Length(max: 255)
+    ])]
     private ?string $name = null;
 
-    #[Groups(['getAllPlaces', 'getPlace'])]
+    #[Groups(['getAllPlaces', 'getPlace', 'getCity'])]
     #[ORM\Column(length: 255)]
+    #[Assert\Sequentially([
+        new Assert\NotBlank(message: 'You must give the place a type.'),
+        new Assert\Type('string'),
+        new Assert\Length(min: 1, max: 255)
+    ])]
     private ?string $type = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['getAllPlaces', 'getPlace', 'getCity'])]
+    #[Assert\Sequentially([
+        new Assert\Type('string'),
+        new Assert\Length(max: 255)
+    ])]
     private ?string $address = null;
 
-    #[ORM\Column(type: Types::TIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $open_hour = null;
-
-    #[ORM\Column(type: Types::TIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $closed_hour = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['getAllPlaces', 'getPlace', 'getCity'])]
+    #[Assert\Sequentially([
+        new Assert\Type("string"),
+        new Assert\Length(5, exactMessage: "Should be in hh:mm format")
+    ])]
+    private ?string $open_hour = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['getAllPlaces', 'getPlace', 'getCity'])]
+    #[Assert\Sequentially([
+        new Assert\Type("string"),
+        new Assert\Length(5, exactMessage: "Should be in hh:mm format")
+    ])]
+    private ?string $closed_hour = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['getAllPlaces', 'getPlace', 'getCity'])]
+    #[Assert\Sequentially([
+        new Assert\Type('string'),
+        new Assert\Length(max: 255)
+    ])]
     private ?string $open_days = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['getAllPlaces', 'getPlace', 'getCity'])]
+    #[Assert\Sequentially([
+        new Assert\Type('integer'),
+        new Assert\Length(min: 1, max: 3)
+    ])]
     private ?int $pricing = null;
 
     #[ORM\ManyToOne(inversedBy: 'places')]
@@ -89,24 +164,24 @@ class Place
         return $this;
     }
 
-    public function getOpenHour(): ?\DateTimeInterface
+    public function getOpenHour(): ?string
     {
         return $this->open_hour;
     }
 
-    public function setOpenHour(?\DateTimeInterface $open_hour): self
+    public function setOpenHour(?string $open_hour): self
     {
         $this->open_hour = $open_hour;
 
         return $this;
     }
 
-    public function getClosedHour(): ?\DateTimeInterface
+    public function getClosedHour(): ?string
     {
         return $this->closed_hour;
     }
 
-    public function setClosedHour(?\DateTimeInterface $closed_hour): self
+    public function setClosedHour(?string $closed_hour): self
     {
         $this->closed_hour = $closed_hour;
 

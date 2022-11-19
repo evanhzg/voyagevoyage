@@ -39,6 +39,19 @@ class CityRepository extends ServiceEntityRepository
         }
     }
 
+    public function findWithPagination(int $page, int $limit, string $orderBy, string $orderByDirection, array $filters){
+        $query = $this->createQueryBuilder('c')
+            ->orderBy("c." . $orderBy, $orderByDirection)
+            ->setMaxResults($limit)
+            ->setFirstResult(($page - 1) * $limit)
+            ->where('c.status = true');
+        foreach ($filters as $filterKey => $filterValue) {
+            $query->andWhere('c.' . $filterKey . $filterValue );
+        }
+        return $query->getQuery()
+            ->getResult();
+    }
+    
 //    /**
 //     * @return City[] Returns an array of City objects
 //     */

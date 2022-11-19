@@ -2,38 +2,92 @@
 
 namespace App\Entity;
 
-use App\Repository\CountryRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation\Groups;
+use App\Repository\CountryRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * @Hateoas\Relation(
+ *      "self",
+ *      href=@Hateoas\Route(
+ *          "countries.get",
+ *          parameters = {"idCountry" = "expr(object.getId())"}
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(groups={"getAllCountries", "getCountry"})
+ * )
+ * @Hateoas\Relation(
+ *      "collection",
+ *      href= @Hateoas\Route(
+ *          "countries.getAll",
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(groups={"getAllCountries", "getCountry"})
+ * )
+ * @Hateoas\Relation(
+ *      "create",
+ *      href= @Hateoas\Route(
+ *          "countries.create"
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(groups={"getAllCountries", "getCountry"})
+ * )
+ * @Hateoas\Relation(
+ *      "update",
+ *      href= @Hateoas\Route(
+ *          "countries.update",
+ *          parameters = {"idCountry" = "expr(object.getId())"}
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(groups={"getAllCountries", "getCountry"})
+ * )
+ * @Hateoas\Relation(
+ *      "remove",
+ *      href= @Hateoas\Route(
+ *          "countries.delete",
+ *          parameters = {"idCountry" = "expr(object.getId())"}
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(groups={"getAllCountries", "getCountry"})
+ * )
+ */
 #[ORM\Entity(repositoryClass: CountryRepository::class)]
 class Country
-{
+{   
+    
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['getAllCountries', 'getCountry'])]
+    #[Groups(['getAllCountries', 'getCountry', 'getCity', 'getAllCities', 'getPlace'])]
     private ?int $id = null;
-
+    
     #[ORM\Column(length: 255)]
-    #[Groups(['getAllCountries', 'getCountry'])]
+    #[Groups(['getAllCountries', 'getCountry', 'getCity', 'getAllCities', 'getPlace'])]
+    #[Assert\Sequentially([
+        new Assert\NotBlank(message: 'You must give the country a name.'),
+        new Assert\Type('string'),
+        new Assert\Length(min: 1, max: 255)
+    ])]
     private ?string $name = null;
 
-    #[ORM\Column(length: 5, nullable: true)]
-    private ?string $language = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['getAllCountries', 'getCountry', 'getCity'])]
+    #[Assert\Sequentially([
+        new Assert\Type('string'),
+        new Assert\Length(min: 1, max: 255)
+    ])]
+    private ?string $languages = null;
 
     #[ORM\Column]
+    #[Groups(['getAllCountries', 'getCountry', 'getCity'])]
+    #[Assert\NotNull(message: 'You must say if the country is part of EU.')]
+    #[Assert\Type('boolean')]
     private ?bool $european = null;
-
-    #[ORM\Column(length: 6)]
-    private ?string $time_zone = null;
 
     #[ORM\Column]
     private ?bool $status = null;
 
     #[ORM\OneToMany(mappedBy: 'country', targetEntity: City::class)]
+    #[Groups(['getCountry'])]
     private Collection $cities;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
@@ -63,14 +117,14 @@ class Country
         return $this;
     }
 
-    public function getLanguage(): ?string
+    public function getLanguages(): ?string
     {
-        return $this->language;
+        return $this->languages;
     }
 
-    public function setLanguage(?string $language): self
+    public function setLanguages(?string $languages): self
     {
-        $this->language = $language;
+        $this->languages = $languages;
 
         return $this;
     }
@@ -83,18 +137,6 @@ class Country
     public function setEuropean(bool $european): self
     {
         $this->european = $european;
-
-        return $this;
-    }
-
-    public function getTimeZone(): ?string
-    {
-        return $this->time_zone;
-    }
-
-    public function setTimeZone(string $time_zone): self
-    {
-        $this->time_zone = $time_zone;
 
         return $this;
     }
