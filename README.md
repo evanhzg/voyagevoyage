@@ -72,4 +72,10 @@ La requête de connexion est dans le dossier Postman. Les credentials sont :
 Récupérez le token donné, et renseignez-le en tant que Bearer Token pour toutes les prochaines requêtes sur l'API.
 
 L'API manipule 3 types de ressources : Country, City et Place.
-Chacune de ses ressources est accessibles via 'ip du serveur'/api/countries, 'ip du serveur'/api/cities, 'ip du serveur'/api/places, 
+Chacune de ses ressources est accessibles via 'ip du serveur'/api/countries, 'ip du serveur'/api/cities, 'ip du serveur'/api/places.
+
+## 4. Documentation
+
+La documentation est disponible via deux endpoints :
+* /api/doc pour la version navigateur
+* /api/doc.json pour la version json
