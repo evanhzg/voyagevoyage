@@ -35,6 +35,55 @@ class CountryController extends AbstractController
     /**
      * Path that returns all countries
      * 
+     * @OA\Response(
+     *     response=200,
+     *     description="Array of countries",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=Country::class, groups={"getAllCountries"}))
+     *     )
+     * )
+     * @OA\Parameter(
+     *     name="limit",
+     *     in="query",
+     *     description="The number of countries per page, by default 10",
+     *     @OA\Schema(type="int")
+     * )
+     * @OA\Parameter(
+     *     name="page",
+     *     in="query",
+     *     description="The page you're at, by default 1",
+     *     @OA\Schema(type="int")
+     * )
+     * @OA\Parameter(
+     *     name="alphabetical",
+     *     in="query",
+     *     description="Sort by name in alphabetical order. Put any value to sort",
+     * )
+     * @OA\Parameter(
+     *     name="reverseAlphabetical",
+     *     in="query",
+     *     description="Sort by name in reverse alphabetical order. Put any value to sort",
+     * )
+     * @OA\Parameter(
+     *     name="name",
+     *     in="query",
+     *     description="Search names that match value",
+     *     @OA\Schema(type="string")
+     * )
+     * @OA\Parameter(
+     *     name="language",
+     *     in="query",
+     *     description="Search languages that match value",
+     *     @OA\Schema(type="string")
+     * )
+     * @OA\Parameter(
+     *     name="european",
+     *     in="query",
+     *     description="Search countries that is european or not",
+     *     @OA\Schema(type="boolean")
+     * )
+     * 
      * @param Request $request
      * @param CountryRepository $countryRepository
      * @param SerializerInterface $serializer
@@ -72,6 +121,15 @@ class CountryController extends AbstractController
     /**
      * Path that returns one country by its id
      * 
+     * @OA\Response(
+     *     response=200,
+     *     description="The country with the id 'idCountry'",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=Country::class, groups={"getCountry"}))
+     *     )
+     * )
+     * 
      * @param Country $country
      * @param SerializerInterface $serializer
      * @return JsonResponse
@@ -90,6 +148,34 @@ class CountryController extends AbstractController
     
     /**
      * Path that creates a country then returns it
+     * 
+     * @OA\Response(
+     *     response=201,
+     *     description="The country created",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=Country::class, groups={"getCountry"}))
+     *     )
+     * )
+     * @OA\Parameter(
+     *     name="name",
+     *     in="query",
+     *     required=true,
+     *     description="Name of the country",
+     *     @OA\Schema(type="string")
+     * )
+     * @OA\Parameter(
+     *     name="languages",
+     *     in="query",
+     *     description="The languages talked in the country",
+     *     @OA\Schema(type="string")
+     * )
+     * @OA\Parameter(
+     *     name="european",
+     *     in="query",
+     *     description="If the country is european or not",
+     *     @OA\Schema(type="boolean")
+     * )
      * 
      * @param Request $request
      * @param CityRepository $cityRepository
@@ -126,6 +212,40 @@ class CountryController extends AbstractController
 
     /**
      * Path that updates a country then returns it
+     * 
+     * @OA\Response(
+     *     response=201,
+     *     description="The country updated",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=Country::class, groups={"getCountry"}))
+     *     )
+     * )
+     * @OA\Parameter(
+     *     name="name",
+     *     in="query",
+     *     required=true,
+     *     description="Name of the country",
+     *     @OA\Schema(type="string")
+     * )
+     * @OA\Parameter(
+     *     name="languages",
+     *     in="query",
+     *     description="The languages talked in the country",
+     *     @OA\Schema(type="string")
+     * )
+     * @OA\Parameter(
+     *     name="european",
+     *     in="query",
+     *     description="If the country is european or not",
+     *     @OA\Schema(type="boolean")
+     * )
+     * @OA\Parameter(
+     *     name="capitalId",
+     *     in="query",
+     *     description="The id of the city that is the capital of the country",
+     *     @OA\Schema(type="int")
+     * )
      * 
      * @param Request $request
      * @param Country $country
@@ -186,6 +306,11 @@ class CountryController extends AbstractController
 
     /**
      * Path that deactivates a country
+     * 
+     * * @OA\Response(
+     *     response=204,
+     *     description="Empty country"
+     * )
      * 
      * @param Country $country
      * @param EntityManagerInterface $entityManager
