@@ -16,7 +16,12 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use OpenApi\Annotations as OA;
 
+/**
+ * @OA\Tag(name="Places")
+ */
 class PlaceController extends AbstractController
 {
     #[Route('/place', name: 'app_place')]
@@ -29,6 +34,55 @@ class PlaceController extends AbstractController
 
     /**
      * Path that returns all places
+     *  
+     * @OA\Response(
+     *     response=200,
+     *     description="Array of places",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=Place::class, groups={"getAllPlaces"}))
+     *     )
+     * )
+     * @OA\Parameter(
+     *     name="limit",
+     *     in="query",
+     *     description="The number of places per page, by default 10",
+     *     @OA\Schema(type="int")
+     * )
+     * @OA\Parameter(
+     *     name="page",
+     *     in="query",
+     *     description="The page you're at, by default 1",
+     *     @OA\Schema(type="int")
+     * )
+     * @OA\Parameter(
+     *     name="alphabetical",
+     *     in="query",
+     *     description="Sort by name in alphabetical order. Put any value to sort",
+     * )
+     * @OA\Parameter(
+     *     name="reverseAlphabetical",
+     *     in="query",
+     *     description="Sort by name in reverse alphabetical order. Put any value to sort",
+     * )
+     * @OA\Parameter(
+     *     name="cityId",
+     *     in="query",
+     *     description="Get places for one city",
+     *     @OA\Schema(type="int")
+     * )
+     * @OA\Parameter(
+     *     name="name",
+     *     in="query",
+     *     description="Search names that match value",
+     *     @OA\Schema(type="string")
+     * )
+     * @OA\Parameter(
+     *     name="open_days",
+     *     in="query",
+     *     description="Search open days that match value",
+     *     @OA\Schema(type="string")
+     * )
      * 
      * @param Request $request
      * @param PlaceRepository $placeRepository
@@ -70,6 +124,15 @@ class PlaceController extends AbstractController
     /**
      * Path that returns one place by its id
      * 
+     * @OA\Response(
+     *     response=200,
+     *     description="The place with the id 'idPlace'",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=Place::class, groups={"getPlace"}))
+     *     )
+     * )
+     * 
      * @param Place $place
      * @param SerializerInterface $serializer
      * @return JsonResponse
@@ -88,6 +151,66 @@ class PlaceController extends AbstractController
     
     /**
      * Path that creates a place then returns it
+     * 
+     * @OA\Response(
+     *     response=201,
+     *     description="The place created",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=Place::class, groups={"getPlace"}))
+     *     )
+     * )
+     * @OA\Parameter(
+     *     name="name",
+     *     in="query",
+     *     required=true,
+     *     description="Name of the place",
+     *     @OA\Schema(type="string")
+     * )
+     * @OA\Parameter(
+     *     name="type",
+     *     in="query",
+     *     required=true,
+     *     description="Type of the place",
+     *     @OA\Schema(type="string")
+     * )
+     * @OA\Parameter(
+     *     name="cityId",
+     *     in="query",
+     *     required=true,
+     *     description="The id of the city the place is in",
+     *     @OA\Schema(type="int")
+     * )
+     * @OA\Parameter(
+     *     name="address",
+     *     in="query",
+     *     description="The address of the place",
+     *     @OA\Schema(type="string")
+     * )
+     * @OA\Parameter(
+     *     name="open_hour",
+     *     in="query",
+     *     description="The hour the place is open. Must be in format 'HH:mm'",
+     *     @OA\Schema(type="string")
+     * )
+     * @OA\Parameter(
+     *     name="closed_hour",
+     *     in="query",
+     *     description="The hour the place is closed. Must be in format 'HH:mm'",
+     *     @OA\Schema(type="string")
+     * )
+     * @OA\Parameter(
+     *     name="open_days",
+     *     in="query",
+     *     description="The days of the week the place is open",
+     *     @OA\Schema(type="string")
+     * )
+     * @OA\Parameter(
+     *     name="pricing",
+     *     in="query",
+     *     description="How expensive the place is, one a scale of 1 to 3",
+     *     @OA\Schema(type="string")
+     * )
      * 
      * @param Request $request
      * @param PlaceRepository $placeRepository
@@ -128,6 +251,63 @@ class PlaceController extends AbstractController
 
     /**
      * Path that updates a place then returns it
+     * 
+     * @OA\Response(
+     *     response=201,
+     *     description="The place updated",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=Place::class, groups={"getPlace"}))
+     *     )
+     * )
+     * @OA\Parameter(
+     *     name="name",
+     *     in="query",
+     *     description="Name of the place",
+     *     @OA\Schema(type="string")
+     * )
+     * @OA\Parameter(
+     *     name="type",
+     *     in="query",
+     *     description="Type of the place",
+     *     @OA\Schema(type="string")
+     * )
+     * @OA\Parameter(
+     *     name="cityId",
+     *     in="query",
+     *     description="The id of the city the place is in",
+     *     @OA\Schema(type="int")
+     * )
+     * @OA\Parameter(
+     *     name="address",
+     *     in="query",
+     *     description="The address of the place",
+     *     @OA\Schema(type="string")
+     * )
+     * @OA\Parameter(
+     *     name="open_hour",
+     *     in="query",
+     *     description="The hour the place is open. Must be in format 'HH:mm'",
+     *     @OA\Schema(type="string")
+     * )
+     * @OA\Parameter(
+     *     name="closed_hour",
+     *     in="query",
+     *     description="The hour the place is closed. Must be in format 'HH:mm'",
+     *     @OA\Schema(type="string")
+     * )
+     * @OA\Parameter(
+     *     name="open_days",
+     *     in="query",
+     *     description="The days of the week the place is open",
+     *     @OA\Schema(type="string")
+     * )
+     * @OA\Parameter(
+     *     name="pricing",
+     *     in="query",
+     *     description="How expensive the place is, one a scale of 1 to 3",
+     *     @OA\Schema(type="string")
+     * )
      * 
      * @param Request $request
      * @param Place $place
@@ -181,6 +361,11 @@ class PlaceController extends AbstractController
 
     /**
      * Methods that deletes a place (no path)
+     * 
+     * @OA\Response(
+     *     response=204,
+     *     description="Empty place"
+     * )
      * 
      * @param Place $place
      * @param EntityManagerInterface $entityManager
